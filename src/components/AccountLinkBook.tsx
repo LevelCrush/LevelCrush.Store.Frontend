@@ -457,7 +457,7 @@ export async function AccountLinkBook() {
   if (!customer) {
     notFound();
   }
-  
+
   return (
     <div className="w-full">
       <div className="w-full flex flex-wrap gap-2">
