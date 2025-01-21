@@ -62,18 +62,6 @@ export const Routes = [
       },
     ],
   },
-  {
-    url: "/profile",
-    name: "Profile",
-    loginOnly: true,
-    pullMenuOnly: true,
-  },
-  {
-    url: "/logout",
-    name: "Logout",
-    loginOnly: true,
-    pullMenuOnly: true,
-  },
 ] as RouteItem[];
 
 export default Routes;

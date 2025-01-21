@@ -112,6 +112,10 @@
   .text-3xl-semi {
     @apply text-[32px] leading-[44px] font-semibold;
   }
+
+  .text-shadow { 
+    text-shadow: 1rem 1rem 1rem;
+  }
 }
 
 
