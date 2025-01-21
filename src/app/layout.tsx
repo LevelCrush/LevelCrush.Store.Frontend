@@ -6,6 +6,7 @@ import "styles/globals.css";
 import SiteHeader from "@levelcrush/site_header";
 import { H2 } from "@levelcrush/elements/headings";
 import DiscordLink from "@levelcrush/discord_link";
+import AccountProvider from "@levelcrush/account/account_provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -33,11 +34,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     return (
       <html lang="en" data-mode="dark" className="dark">
         <body>
-          <OffCanvas>
-            <SiteHeader />
-            <ProgressBarProvider></ProgressBarProvider>
-            <main className="relative">{props.children}</main>
-          </OffCanvas>
+          <AccountProvider>
+            <OffCanvas>
+              <SiteHeader />
+              <ProgressBarProvider></ProgressBarProvider>
+              <main className="relative">{props.children}</main>
+            </OffCanvas>
+          </AccountProvider>
         </body>
       </html>
     );
