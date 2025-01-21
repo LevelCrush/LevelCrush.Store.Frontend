@@ -4,29 +4,43 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { StoreCustomer } from "@medusajs/types";
 import { retrieveCustomer } from "@lib/data/customer";
 
+export type GenericCallback = () => Promise<void>;
+
 export const AccountProviderContext = createContext({
   account: null as StoreCustomer | null,
+  accountFetch: async (): Promise<void> => {},
 });
 
 export function AccountProvider(props: React.PropsWithChildren<{}>) {
   const [account, setAccount] = useState(null as StoreCustomer | null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  async function fetchAccount() {
+    if (isLoading) {
+      return;
+    }
     setIsLoading(true);
-    retrieveCustomer().then((res) => {
-        setAccount(res);
-    }).catch((err) => {
+
+    try {
+        console.log("Updating account");
+        const acc = await retrieveCustomer("no-store");
+        setAccount(acc);
+    } catch(err) {
         setAccount(null);
-    }).finally(() => {
+    } finally { 
         setIsLoading(false);
-    });
+    }
+  }
+
+  useEffect(() => {
+    fetchAccount();
   }, []);
 
   return (
     <AccountProviderContext.Provider
       value={{
         account: account,
+        accountFetch: fetchAccount,
       }}
     >
       {props.children}

@@ -7,6 +7,7 @@ import { MetadataType, StoreCustomer } from "@medusajs/types";
 import { Suspense, useContext, useState } from "react";
 import { updateCustomer } from "@lib/data/customer";
 import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 interface BungieValidationResult {
   membershipId: string;
@@ -24,7 +25,6 @@ interface DiscordValidationResult {
 export type AccountLinkPlatforMetaValueType = "string" | "boolean";
 
 interface AccountLinkPlatformProps {
-  customer?: StoreCustomer | null;
   title: string;
   platform: "discord" | "bungie";
   badges: {
@@ -38,11 +38,13 @@ interface AccountLinkPlatformProps {
 }
 
 export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
-  if (!props.customer) {
+  const { account, accountFetch } = useContext(AccountProviderContext);
+
+  if (!account) {
     return <></>;
   }
 
-  const metadata = props.customer.metadata || {};
+  const [metadata, setMetadata] = useState(account.metadata || {});
   const [accountId, setAccountId] = useState(
     (metadata[props.metakeyAccountID] as string) || ""
   );
@@ -50,6 +52,21 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
   const [displayName, setDisplayName] = useState(
     (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
   );
+
+  useDeepCompareEffect(() => {
+    setAccountId((metadata[props.metakeyAccountID] as string) || "");
+    setDisplayName(
+      (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
+    );
+  }, [metadata]);
+
+  useDeepCompareEffect(() => {
+    if (!account) {
+      setMetadata({});
+    } else {
+      setMetadata(account.metadata || {});
+    }
+  }, [account]);
 
   async function checkPlatformSession() {
     const req = await fetch(
@@ -77,28 +94,11 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       newMetadata[key] = "";
     }
 
-    if (!props.customer) {
-      return;
-    }
-
-    if (!props.customer.metadata) {
-      props.customer.metadata = {};
-    }
-
-    for (const pkey of platformKeys) {
-      if (typeof props.customer.metadata[pkey] !== "undefined") {
-        props.customer.metadata[pkey] = "";
-      }
-    }
-
-    setAccountId("");
-    setDisplayName("NOT LINKED");
-
     await updateCustomer({
       metadata: newMetadata,
     });
 
-    
+    await accountFetch();
   }
 
   function startLogin() {
@@ -126,22 +126,6 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
                 discordValidation.discordHandle || "";
               newMetadata["discord.server_member"] = discordValidation.inServer;
 
-              setDisplayName(newMetadata["discord.handle"] as string);
-              setAccountId(newMetadata["discord.id"] as string);
-
-              if (!props.customer) {
-                return;
-              }
-
-              if (!props.customer.metadata) {
-                props.customer.metadata = {};
-              }
-
-              props.customer.metadata = {
-                ...props.customer.metadata,
-                ...newMetadata,
-              };
-
               await updateCustomer({
                 metadata: newMetadata,
               });
@@ -160,27 +144,12 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
               newMetadata["bungie.clan_member"] =
                 bungieValidation.inNetworkClan;
 
-              setDisplayName(newMetadata["bungie.handle"] as string);
-              setAccountId(newMetadata["bungie.id"] as string);
-
-              if (!props.customer) {
-                return;
-              }
-
-              if (!props.customer.metadata) {
-                props.customer.metadata = {};
-              }
-
-              props.customer.metadata = {
-                ...props.customer.metadata,
-                ...newMetadata,
-              };
-
               await updateCustomer({
                 metadata: newMetadata,
               });
             }
           }
+          await accountFetch();
         }
       }, 1000);
     }

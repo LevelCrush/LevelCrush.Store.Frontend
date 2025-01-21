@@ -15,7 +15,7 @@ import {
 } from "./cookies"
 
 export const retrieveCustomer =
-  async (): Promise<HttpTypes.StoreCustomer | null> => {
+  async (cache:"force-cache" | "no-store" = "force-cache"): Promise<HttpTypes.StoreCustomer | null> => {
     const headers = {
       ...(await getAuthHeaders()),
     }
@@ -32,7 +32,7 @@ export const retrieveCustomer =
         },
         headers,
         next,
-        cache: "force-cache",
+        cache: cache,
       })
       .then(({ customer }) => customer)
       .catch(() => null)

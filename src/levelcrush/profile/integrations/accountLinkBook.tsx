@@ -7,14 +7,16 @@ import { useContext } from "react";
 import { AccountProviderContext } from "@levelcrush/account/account_provider";
 
 export function AccountLinkBook() {
+  const { account } = useContext(AccountProviderContext);
 
-  const {account} = useContext(AccountProviderContext);
+  if (!account) {
+    return <></>;
+  }
 
   return (
     <div className="w-full">
       <div className="w-full flex flex-wrap gap-2">
         <AccountLinkPlatform
-          customer={account}
           title="Discord"
           metakeyDisplayName="discord.handle"
           metakeyAccountID="discord.id"
@@ -35,7 +37,6 @@ export function AccountLinkBook() {
           ]}
         />
         <AccountLinkPlatform
-          customer={account}
           title="Bungie"
           metakeyDisplayName="bungie.handle"
           metakeyAccountID="bungie.id"
