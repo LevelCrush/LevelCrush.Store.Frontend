@@ -21,6 +21,18 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "levelcrush.com.s3.us-east-1.amazonaws.com"
+      },
+      {
+        protocol: "https",
+        hostname: "s3.us-east-1.amazonaws.com"
+      },
+      {
+        protocol: "https",
+        hostname: "assets.levelcrush.com"
+      },
+      {
         protocol: "http",
         hostname: "localhost",
       },

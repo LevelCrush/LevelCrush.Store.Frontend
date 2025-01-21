@@ -4,10 +4,11 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import StoreTemplate from "@modules/store/templates"
 
 export const metadata: Metadata = {
-  title: "Store",
+  title: "Store | Level Crush",
   description: "Explore all of our products.",
 }
 
+/*
 type Params = {
   searchParams: Promise<{
     sortBy?: SortOptions
@@ -16,10 +17,18 @@ type Params = {
   params: Promise<{
     countryCode: string
   }>
+} */
+
+type Params = {
+  searchParams: Promise<{
+    sortBy?: SortOptions
+    page?: string
+  }>
 }
 
-export default async function StorePage(props: Params) {
-  const params = await props.params;
+//export default async function StorePage(props: Params) {
+  export default async function StorePage(props: Params) {
+  //const params = await props.params;
   const searchParams = await props.searchParams;
   const { sortBy, page } = searchParams
 
@@ -27,7 +36,8 @@ export default async function StorePage(props: Params) {
     <StoreTemplate
       sortBy={sortBy}
       page={page}
-      countryCode={params.countryCode}
+      countryCode="us"
+    //  countryCode={params.countryCode}
     />
   )
 }
