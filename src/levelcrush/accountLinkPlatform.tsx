@@ -194,3 +194,5 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     </div>
   );
 }
+
+export default AccountLinkPlatform;

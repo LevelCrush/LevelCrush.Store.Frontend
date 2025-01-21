@@ -1,4 +1,9 @@
 const path = require("path")
+/**
+ * @type {import('tailwindcss/plugin')}
+ */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const plugin = require('tailwindcss/plugin');
 
 module.exports = {
   darkMode: "class",
@@ -54,22 +59,24 @@ module.exports = {
         large: "1440px",
         xlarge: "1680px",
         "2xlarge": "1920px",
+        '2xl': '1536px',
+        '2k': '1921px',
+        '1440p': '2160px',
+        '720p': '719px',
+        '1080p': '1079px',
+        '4k': '2397px',
+        
       },
       fontSize: {
         "3xl": "2rem",
       },
+      transparent: 'transparent',
+      current: 'currentColor',
       fontFamily: {
-        sans: [
-          "Inter",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
-          "sans-serif",
-        ],
+        sans: ['acumin-pro', 'sans-serif'],
+        headline: ['atrament-web', 'sans-serif'],
       },
+
       keyframes: {
         ring: {
           "0%": { transform: "rotate(0deg)" },
@@ -158,5 +165,19 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-radix")()],
+  plugins: [
+    require("tailwindcss-radix")(),
+    plugin(function({addVariant}) {
+      addVariant('offcanvas-opened', '.offcanvas[data-showing="1"] &');
+      addVariant('offcanvas-closed', '.offcanvas[data-showing="0"] &');
+      addVariant('is-member', '.offcanvas[data-is-member="1"] &');
+      addVariant('is-not-member', '.offcanvas[data-is-member="0"] &');
+      addVariant('expanded', '.expanded &');
+      addVariant('expanded-hover', '.expanded:hover &');
+      addVariant('toggle-yes', 'input[type="checkbox"]:checked + &');
+      addVariant('btn-dropdown', 'button.dropdown + &');
+      addVariant('btn-dropdown-showing', 'button.dropdown &');
+      addVariant('sticky', '.navigation-bar.is-sticky &');
+    })
+  ],
 }
