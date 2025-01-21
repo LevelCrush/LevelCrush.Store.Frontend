@@ -1,22 +1,22 @@
-import { HttpTypes } from "@medusajs/types"
-import { NextRequest, NextResponse } from "next/server"
+import { HttpTypes } from "@medusajs/types";
+import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
-const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
+const BACKEND_URL = process.env.MEDUSA_BACKEND_URL;
+const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
+const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us";
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
   regionMapUpdated: Date.now(),
-}
+};
 
 async function getRegionMap(cacheId: string) {
-  const { regionMap, regionMapUpdated } = regionMapCache
+  const { regionMap, regionMapUpdated } = regionMapCache;
 
   if (!BACKEND_URL) {
     throw new Error(
       "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a MEDUSA_BACKEND_URL environment variable? Note that the variable is no longer named NEXT_PUBLIC_MEDUSA_BACKEND_URL."
-    )
+    );
   }
 
   if (
@@ -34,32 +34,32 @@ async function getRegionMap(cacheId: string) {
       },
       cache: "force-cache",
     }).then(async (response) => {
-      const json = await response.json()
+      const json = await response.json();
 
       if (!response.ok) {
-        throw new Error(json.message)
+        throw new Error(json.message);
       }
 
-      return json
-    })
+      return json;
+    });
 
     if (!regions?.length) {
       throw new Error(
         "No regions found. Please set up regions in your Medusa Admin."
-      )
+      );
     }
 
     // Create a map of country codes to regions.
     regions.forEach((region: HttpTypes.StoreRegion) => {
       region.countries?.forEach((c) => {
-        regionMapCache.regionMap.set(c.iso_2 ?? "", region)
-      })
-    })
+        regionMapCache.regionMap.set(c.iso_2 ?? "", region);
+      });
+    });
 
-    regionMapCache.regionMapUpdated = Date.now()
+    regionMapCache.regionMapUpdated = Date.now();
   }
 
-  return regionMapCache.regionMap
+  return regionMapCache.regionMap;
 }
 
 /**
@@ -72,30 +72,32 @@ async function getCountryCode(
   regionMap: Map<string, HttpTypes.StoreRegion | number>
 ) {
   try {
-    let countryCode
+    let countryCode;
 
     const vercelCountryCode = request.headers
       .get("x-vercel-ip-country")
-      ?.toLowerCase()
+      ?.toLowerCase();
 
-    const urlCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
+    const urlCountryCode = request.nextUrl.pathname
+      .split("/")[1]
+      ?.toLowerCase();
 
     if (urlCountryCode && regionMap.has(urlCountryCode)) {
-      countryCode = urlCountryCode
+      countryCode = urlCountryCode;
     } else if (vercelCountryCode && regionMap.has(vercelCountryCode)) {
-      countryCode = vercelCountryCode
+      countryCode = vercelCountryCode;
     } else if (regionMap.has(DEFAULT_REGION)) {
-      countryCode = DEFAULT_REGION
+      countryCode = DEFAULT_REGION;
     } else if (regionMap.keys().next().value) {
-      countryCode = regionMap.keys().next().value
+      countryCode = regionMap.keys().next().value;
     }
 
-    return countryCode
+    return countryCode;
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.error(
         "Middleware.ts: Error getting the country code. Did you set up regions in your Medusa Admin and define a MEDUSA_BACKEND_URL environment variable? Note that the variable is no longer named NEXT_PUBLIC_MEDUSA_BACKEND_URL."
-      )
+      );
     }
   }
 }
@@ -103,6 +105,8 @@ async function getCountryCode(
 /**
  * Middleware to handle region selection and onboarding status.
  */
+
+/*
 export async function middleware(request: NextRequest) {
   let redirectUrl = request.nextUrl.href
 
@@ -150,10 +154,13 @@ export async function middleware(request: NextRequest) {
   }
 
   return response
+} */
+export async function middleware(request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|images|assets|png|svg|jpg|jpeg|gif|webp).*)",
   ],
-}
+};

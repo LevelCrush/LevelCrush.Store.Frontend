@@ -1,16 +1,17 @@
-import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
-import { Text, clx } from "@medusajs/ui"
+import { listCategories } from "@lib/data/categories";
+import { listCollections } from "@lib/data/collections";
+import { Text, clx } from "@medusajs/ui";
 
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import MedusaCTA from "@modules/layout/components/medusa-cta";
 
 export default async function Footer() {
   const { collections } = await listCollections({
     fields: "*products",
-  })
-  const productCategories = await listCategories()
+  });
+  const productCategories = await listCategories();
 
+  return <footer></footer>;
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full">
@@ -35,7 +36,7 @@ export default async function Footer() {
                 >
                   {productCategories?.slice(0, 6).map((c) => {
                     if (c.parent_category) {
-                      return
+                      return;
                     }
 
                     const children =
@@ -43,7 +44,7 @@ export default async function Footer() {
                         name: child.name,
                         handle: child.handle,
                         id: child.id,
-                      })) || null
+                      })) || null;
 
                     return (
                       <li
@@ -77,7 +78,7 @@ export default async function Footer() {
                           </ul>
                         )}
                       </li>
-                    )
+                    );
                   })}
                 </ul>
               </div>
@@ -153,5 +154,5 @@ export default async function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
