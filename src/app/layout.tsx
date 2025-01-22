@@ -7,6 +7,7 @@ import SiteHeader from "@levelcrush/site_header";
 import { H2 } from "@levelcrush/elements/headings";
 import DiscordLink from "@levelcrush/discord_link";
 import AccountProvider, { AccountProviderContext } from "@levelcrush/account/account_provider";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -23,7 +24,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <AccountProvider>
             <OffCanvas>
               <SiteHeader />
-              <ProgressBarProvider></ProgressBarProvider>
+              <Suspense><ProgressBarProvider></ProgressBarProvider></Suspense>
               <main className="relative min-h-full flex justify-center items-center">
                 <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center">
                   <H2 className="w-full text-center">We just game.</H2>
@@ -42,7 +43,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <AccountProvider>
             <OffCanvas>
               <SiteHeader />
-              <ProgressBarProvider></ProgressBarProvider>
+              <Suspense><ProgressBarProvider></ProgressBarProvider></Suspense>
               <main className="relative">{props.children}</main>
             </OffCanvas>
           </AccountProvider>
