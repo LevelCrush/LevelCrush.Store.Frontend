@@ -48,7 +48,7 @@ export const SiteHeader = (props: SiteHeaderProps) => {
           className="relative flex-auto px-4 flex mx-auto my-0 justify-between items-center flex-wrap md:flex-nowrap "
         >
           <div className="flex-initial text-center md:text-left absolute">
-            <OffCanvasToggle className="float-left text-yellow-400  text-4xl font-headline font-bold uppercase tracking-widest drop-shadow-lg" />
+            <OffCanvasToggle className="float-left text-yellow-400  text-4xl font-headline font-bold uppercase tracking-widest drop-shadow-custom sticky:drop-shadow-none" />
             <div className="clear-both"></div>
           </div>
 

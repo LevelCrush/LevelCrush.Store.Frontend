@@ -6,6 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faAngleDoubleRight } from "@fortawesome/free-solid-svg-icons";
 import Hyperlink from "@levelcrush/elements/hyperlink";
 import { H1 } from "@levelcrush/elements/headings";
+import { AccountProviderContext } from "./account/account_provider";
+import useDeepCompareEffect, { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
+import { isObject } from "@lib/util/isEmpty";
+import { signout } from "@lib/data/customer";
 
 export interface OffcanvasContextDefinition {
   opened: boolean;
@@ -77,10 +81,14 @@ export const OffCanvasToggle = (props: OffCanvasToggleProps) => (
  * @constructor
  */
 export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
+
+  const { account } = useContext(AccountProviderContext);
+
   const [showing, setShowing] = useState(false);
   const [routes, setRoutes] = useState(props.routes || Routes);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isMember, setIsMember] = useState(false);
+  const [isMember, setIsMember] = useState(isObject(account));
+
 
   const eventCanvasToggle = () => {
     dispatchEvent(showing ? "offcanvas_hide" : "offcanvas_show");
@@ -111,6 +119,11 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
     };
   }, []);
 
+
+  useDeepCompareEffectNoCheck(() => {
+    setIsMember(isObject(account));
+  }, [account]);
+
   return (
     <OffCanvasContext.Provider value={{ opened: showing }}>
       <div
@@ -131,13 +144,12 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
           </H1>
           <ul className="text-white font-bold">
             {(routes || []).map((routeItem, routeItemIndex) => {
-              /*
-            if (routeItem.loginOnly && isMember === false) {
-              return <></>;
-            }
-            if (routeItem.adminOnly && isAdmin === false) {
-              return <></>;
-            } */
+              if (routeItem.loginOnly && isMember === false) {
+                return <li className="hidden login-route"  key={"routeitem_" + routeItemIndex + "_" + routeItem.url}></li>
+              }
+              if (routeItem.adminOnly && isAdmin === false) {
+                return <li className="hidden admin-route"  key={"routeitem_" + routeItemIndex + "_" + routeItem.url}></li>
+              }
 
               return (
                 <li
@@ -164,7 +176,13 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                               }
                             }
                           }
-                        : undefined
+                        : routeItem.signout 
+                          ? (ev) => {
+                            ev.preventDefault();
+                            signout("us");
+                            return false;
+                          }
+                          : undefined
                     }
                   >
                     {(routeItem.children || []).length > 0 ? (
@@ -204,6 +222,14 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                             <Hyperlink
                               className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-transparent dark:hover:bg-opacity-10 transition duration-300"
                               href={subChild.url}
+                              onClick={routeItem.signout 
+                                ? (ev) => {
+                                  ev.preventDefault();
+                                  signout("us");
+                                  return false;
+                                }
+                                : undefined
+                              }
                             >
                               <span className="block border-l-2  border-solid border-black dark:border-cyan-500 pl-4">
                                 {subChild.name}
