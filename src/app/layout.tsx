@@ -43,15 +43,17 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     return (
       <html lang="en" data-mode="dark" className="dark">
         <body>
-          <AccountProvider>
-            <OffCanvas>
-              <SiteHeader />
-              <Suspense>
-                <ProgressBarProvider></ProgressBarProvider>
-              </Suspense>
-              <main className="relative">{props.children}</main>
-            </OffCanvas>
-          </AccountProvider>
+          <Suspense>
+            <AccountProvider>
+              <OffCanvas>
+                <SiteHeader />
+                <Suspense>
+                  <ProgressBarProvider></ProgressBarProvider>
+                </Suspense>
+                <main className="relative">{props.children}</main>
+              </OffCanvas>
+            </AccountProvider>
+          </Suspense>
         </body>
       </html>
     );
