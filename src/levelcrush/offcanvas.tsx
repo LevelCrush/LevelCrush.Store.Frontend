@@ -145,7 +145,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                   key={"routeitem_" + routeItemIndex + "_" + routeItem.url}
                 >
                   <Hyperlink
-                    className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-white dark:hover:bg-opacity-10 transition duration-300"
+                    className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-transparent dark:hover:bg-opacity-10 transition duration-300"
                     href={routeItem.url}
                     data-has-sub={
                       (routeItem.children || []).length > 0 ? "1" : "0"
@@ -202,7 +202,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                             }
                           >
                             <Hyperlink
-                              className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-white dark:hover:bg-opacity-10 transition duration-300"
+                              className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-transparent dark:hover:bg-opacity-10 transition duration-300"
                               href={subChild.url}
                             >
                               <span className="block border-l-2  border-solid border-black dark:border-cyan-500 pl-4">

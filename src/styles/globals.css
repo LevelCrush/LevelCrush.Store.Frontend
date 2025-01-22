@@ -453,7 +453,7 @@
     transform: translate(0.25rem, 0.25rem);
     transition: transform 250ms ease;
     border-radius: 1rem;
-    @apply bg-white;
+    @apply bg-transparent;
   }
 
   .toggle input:checked + .slider {
