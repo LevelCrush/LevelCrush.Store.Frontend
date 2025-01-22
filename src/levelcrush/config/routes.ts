@@ -71,6 +71,14 @@ export const Routes = [
         url: "/cart",
         name: "Cart",
       },
+      {
+        url: "/products",
+        name: "Products",
+      },
+      {
+        url: "/products/holiday-gift",
+        name: "Holiday Gift",
+      },
     ],
   },
   {
