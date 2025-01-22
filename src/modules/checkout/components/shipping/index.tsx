@@ -92,7 +92,7 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [isOpen])
 
   return (
-    <div className="bg-transparent">
+    <div className="bg-ui-bg-base p-4">
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
@@ -153,7 +153,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       }
                     )}
                   >
-                    <div className="flex items-center gap-x-4">
+                    <div className="flex items-center gap-x-4  bg-ui-bg-base hover:bg-ui-bg-base-hover">
                       <MedusaRadio checked={option.id === shippingMethodId} />
                       <span className="text-base-regular">{option.name}</span>
                     </div>

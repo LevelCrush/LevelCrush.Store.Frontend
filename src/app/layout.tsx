@@ -6,6 +6,10 @@ import "styles/globals.css";
 import SiteHeader from "@levelcrush/site_header";
 import { H2 } from "@levelcrush/elements/headings";
 import DiscordLink from "@levelcrush/discord_link";
+import AccountProvider, {
+  AccountProviderContext,
+} from "@levelcrush/account/account_provider";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -16,16 +20,22 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     return (
       <html lang="en" data-mode="dark" className="dark">
         <body>
-          <OffCanvas>
-            <SiteHeader />
-            <ProgressBarProvider></ProgressBarProvider>
-            <main className="relative min-h-full flex justify-center items-center">
-              <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center">
-                <H2 className="w-full text-center">We just game.</H2>
-                <DiscordLink />
-              </div>
-            </main>
-          </OffCanvas>
+          <Suspense>
+            <AccountProvider>
+              <OffCanvas>
+                <SiteHeader />
+                <Suspense>
+                  <ProgressBarProvider></ProgressBarProvider>
+                </Suspense>
+                <main className="relative min-h-full flex justify-center items-center">
+                  <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center">
+                    <H2 className="w-full text-center">We just game.</H2>
+                    <DiscordLink />
+                  </div>
+                </main>
+              </OffCanvas>
+            </AccountProvider>
+          </Suspense>
         </body>
       </html>
     );
@@ -33,11 +43,17 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     return (
       <html lang="en" data-mode="dark" className="dark">
         <body>
-          <OffCanvas>
-            <SiteHeader />
-            <ProgressBarProvider></ProgressBarProvider>
-            <main className="relative">{props.children}</main>
-          </OffCanvas>
+          <Suspense>
+            <AccountProvider>
+              <OffCanvas>
+                <SiteHeader />
+                <Suspense>
+                  <ProgressBarProvider></ProgressBarProvider>
+                </Suspense>
+                <main className="relative">{props.children}</main>
+              </OffCanvas>
+            </AccountProvider>
+          </Suspense>
         </body>
       </html>
     );

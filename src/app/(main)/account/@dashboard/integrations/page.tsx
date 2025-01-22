@@ -5,7 +5,7 @@ import AddressBook from "@modules/account/components/address-book";
 
 import { getRegion } from "@lib/data/regions";
 import { retrieveCustomer } from "@lib/data/customer";
-import AccountLinkBook from "@levelcrush/accountLinkBook";
+import AccountLinkBook from "@levelcrush/profile/integrations/accountLinkBook";
 
 export const metadata: Metadata = {
   title: "Integrations",

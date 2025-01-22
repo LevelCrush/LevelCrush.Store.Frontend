@@ -1,18 +1,22 @@
-import { retrieveCustomer } from "@lib/data/customer";
-import AccountLinkPlatform from "@levelcrush/accountLinkPlatform";
-import { notFound } from "next/navigation";
+"use client";
 
-export async function AccountLinkBook() {
-  const customer = await retrieveCustomer();
-  if (!customer) {
-    notFound();
+import { retrieveCustomer } from "@lib/data/customer";
+import AccountLinkPlatform from "@levelcrush/profile/integrations/accountLinkPlatform";
+import { notFound } from "next/navigation";
+import { useContext } from "react";
+import { AccountProviderContext } from "@levelcrush/account/account_provider";
+
+export function AccountLinkBook() {
+  const { account } = useContext(AccountProviderContext);
+
+  if (!account) {
+    return <></>;
   }
 
   return (
     <div className="w-full">
       <div className="w-full flex flex-wrap gap-2">
         <AccountLinkPlatform
-          customer={customer}
           title="Discord"
           metakeyDisplayName="discord.handle"
           metakeyAccountID="discord.id"
@@ -33,7 +37,6 @@ export async function AccountLinkBook() {
           ]}
         />
         <AccountLinkPlatform
-          customer={customer}
           title="Bungie"
           metakeyDisplayName="bungie.handle"
           metakeyAccountID="bungie.id"

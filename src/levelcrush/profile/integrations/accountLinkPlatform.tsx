@@ -4,8 +4,10 @@ import { Badge, Button } from "@medusajs/ui";
 import Trash from "@modules/common/icons/trash";
 import { Check, XMark, Link } from "@medusajs/icons";
 import { MetadataType, StoreCustomer } from "@medusajs/types";
-import { useState } from "react";
+import { Suspense, useContext, useState } from "react";
 import { updateCustomer } from "@lib/data/customer";
+import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 interface BungieValidationResult {
   membershipId: string;
@@ -22,9 +24,7 @@ interface DiscordValidationResult {
 
 export type AccountLinkPlatforMetaValueType = "string" | "boolean";
 
-
 interface AccountLinkPlatformProps {
-  customer: StoreCustomer;
   title: string;
   platform: "discord" | "bungie";
   badges: {
@@ -38,15 +38,35 @@ interface AccountLinkPlatformProps {
 }
 
 export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
-  const metadata = props.customer.metadata || {};
+  const { account, accountFetch } = useContext(AccountProviderContext);
 
+  if (!account) {
+    return <></>;
+  }
+
+  const [metadata, setMetadata] = useState(account.metadata || {});
   const [accountId, setAccountId] = useState(
     (metadata[props.metakeyAccountID] as string) || ""
   );
-  
+
   const [displayName, setDisplayName] = useState(
     (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
   );
+
+  useDeepCompareEffect(() => {
+    setAccountId((metadata[props.metakeyAccountID] as string) || "");
+    setDisplayName(
+      (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
+    );
+  }, [metadata]);
+
+  useDeepCompareEffect(() => {
+    if (!account) {
+      setMetadata({});
+    } else {
+      setMetadata(account.metadata || {});
+    }
+  }, [account]);
 
   async function checkPlatformSession() {
     const req = await fetch(
@@ -65,18 +85,20 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     return data;
   }
 
-  async function unlinkPlatform() { 
-     const platformKeys = Object.keys(metadata).filter((v) => v.startsWith(props.platform));
-     const newMetadata = {} as Record<string, unknown>;
-     for(const key of platformKeys) { 
-        newMetadata[key] = "";
-     }
-     
-     await updateCustomer({
-        metadata: newMetadata
-     });
+  async function unlinkPlatform() {
+    const platformKeys = Object.keys(metadata).filter((v) =>
+      v.startsWith(props.platform)
+    );
+    const newMetadata = {} as Record<string, unknown>;
+    for (const key of platformKeys) {
+      newMetadata[key] = "";
+    }
 
-     window.location.reload();
+    await updateCustomer({
+      metadata: newMetadata,
+    });
+
+    await accountFetch();
   }
 
   function startLogin() {
@@ -91,54 +113,60 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
         if (childWindow?.closed) {
           clearInterval(intervalHandle);
           const data = await checkPlatformSession();
-         
-          if(props.platform == "discord") { 
+
+          if (props.platform == "discord") {
             const discordValidation = data as DiscordValidationResult;
-            if(discordValidation.discordId && discordValidation.discordId.length > 0) { 
+            if (
+              discordValidation.discordId &&
+              discordValidation.discordId.length > 0
+            ) {
+              const newMetadata = {} as Record<string, unknown>;
+              newMetadata["discord.id"] = discordValidation.discordId || "";
+              newMetadata["discord.handle"] =
+                discordValidation.discordHandle || "";
+              newMetadata["discord.server_member"] = discordValidation.inServer;
 
-                const newMetadata = {} as Record<string, unknown>;
-                newMetadata["discord.id"] = discordValidation.discordId || "";
-                newMetadata["discord.handle"] = discordValidation.discordHandle || "";
-                newMetadata["discord.server_member"] = discordValidation.inServer;
-
-                await updateCustomer({
-                    metadata: newMetadata
-                });
-            } 
-          } else if(props.platform == "bungie") {
+              await updateCustomer({
+                metadata: newMetadata,
+              });
+            }
+          } else if (props.platform == "bungie") {
             const bungieValidation = data as BungieValidationResult;
-            if(bungieValidation.membershipId && bungieValidation.membershipId.length > 0) { 
+            if (
+              bungieValidation.membershipId &&
+              bungieValidation.membershipId.length > 0
+            ) {
+              const newMetadata = {} as Record<string, unknown>;
+              newMetadata["bungie.id"] = bungieValidation.membershipId || "";
+              newMetadata["bungie.handle"] = bungieValidation.displayName || "";
+              newMetadata["bungie.platform"] =
+                bungieValidation.membershipType || -1;
+              newMetadata["bungie.clan_member"] =
+                bungieValidation.inNetworkClan;
 
-                const newMetadata = {} as Record<string, unknown>;
-                newMetadata["bungie.id"] = bungieValidation.membershipId || "";
-                newMetadata["bungie.handle"] = bungieValidation.displayName || "";
-                newMetadata["bungie.platform"] = bungieValidation.membershipType || -1;
-                newMetadata["bungie.clan_member"] = bungieValidation.inNetworkClan;
-                await updateCustomer({
-                    metadata: newMetadata
-                });
-            } 
+              await updateCustomer({
+                metadata: newMetadata,
+              });
+            }
           }
-          window.location.reload();
+          await accountFetch();
         }
       }, 1000);
     }
   }
 
-  function badgeResultValid(input: unknown) { 
-
+  function badgeResultValid(input: unknown) {
     const metavalue = input || "";
-    switch(typeof metavalue) {
-        case "string":  
-            return `${metavalue}`.length > 0;
-        case "boolean":
-            return metavalue;
-        default:
-            console.log("Unknown meta value type", metavalue);
-            return false;
+    switch (typeof metavalue) {
+      case "string":
+        return `${metavalue}`.length > 0;
+      case "boolean":
+        return metavalue;
+      default:
+        console.log("Unknown meta value type", metavalue);
+        return false;
     }
   }
-
 
   return (
     <div
@@ -155,12 +183,14 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
                 : badge.tooltip_invalid || ""
             }
             className="w-auto basis-auto text-center"
-            color={badgeResultValid(metadata[badge.metakeyResult])  ? "green" : "grey"}
+            color={
+              badgeResultValid(metadata[badge.metakeyResult]) ? "green" : "grey"
+            }
             key={`${index}-platform-link-${props.title}`}
           >
-            { badgeResultValid(metadata[badge.metakeyResult]) 
-             ? <Check />
-             : (
+            {badgeResultValid(metadata[badge.metakeyResult]) ? (
+              <Check />
+            ) : (
               <XMark />
             )}
             {badge.name}

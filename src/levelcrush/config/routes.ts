@@ -3,6 +3,7 @@ export interface RouteItem {
   name: string;
   loginOnly?: boolean;
   adminOnly?: boolean;
+  signout?: boolean;
   target?: "_blank" | "_self";
   children?: RouteItem[];
 }
@@ -61,6 +62,36 @@ export const Routes = [
         name: "Engram.blue",
       },
     ],
+  },
+  {
+    url: "#Store",
+    name: "Store",
+    children: [
+      {
+        url: "/cart",
+        name: "Cart",
+      },
+      {
+        url: "/products",
+        name: "Products",
+      },
+      {
+        url: "/products/holiday-gift",
+        name: "Holiday Gift",
+      },
+    ],
+  },
+  {
+    url: "/account",
+    name: "Account",
+    loginOnly: true,
+  },
+
+  {
+    url: "/account/logout",
+    name: "Log out",
+    loginOnly: true,
+    signout: true,
   },
 ] as RouteItem[];
 

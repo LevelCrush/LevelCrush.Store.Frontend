@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import Container from './elements/container';
-import { H1 } from './elements/headings';
-import Hyperlink from './elements/hyperlink';
-import { OffCanvasToggle } from '@levelcrush/offcanvas';
-import DiscordLink from '@levelcrush/discord_link';
+import React, { Suspense, useEffect } from "react";
+import Container from "./elements/container";
+import { H1 } from "./elements/headings";
+import Hyperlink from "./elements/hyperlink";
+import { OffCanvasToggle } from "@levelcrush/offcanvas";
+import DiscordLink from "@levelcrush/discord_link";
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import CartButton from "@levelcrush/cart/cart-button";
 
 export interface SiteHeaderProps {
   forceStickyStyle?: boolean;
@@ -14,15 +16,15 @@ export interface SiteHeaderProps {
 export const SiteHeader = (props: SiteHeaderProps) => {
   useEffect(() => {
     if (props.forceStickyStyle) {
-      const el = document.querySelector('.navigation-bar');
+      const el = document.querySelector(".navigation-bar");
       if (el) {
-        el.classList.add('is-sticky');
+        el.classList.add("is-sticky");
       }
     } else {
-      const el = document.querySelector('.navigation-bar');
+      const el = document.querySelector(".navigation-bar");
       const observer = new IntersectionObserver(
         ([e]) =>
-          e.target.classList.toggle('is-sticky', e.intersectionRatio < 1),
+          e.target.classList.toggle("is-sticky", e.intersectionRatio < 1),
         { threshold: [1] }
       );
       if (el) {
@@ -46,7 +48,7 @@ export const SiteHeader = (props: SiteHeaderProps) => {
           className="relative flex-auto px-4 flex mx-auto my-0 justify-between items-center flex-wrap md:flex-nowrap "
         >
           <div className="flex-initial text-center md:text-left absolute">
-            <OffCanvasToggle className="float-left text-yellow-400  text-4xl font-headline font-bold uppercase tracking-widest drop-shadow-lg" />
+            <OffCanvasToggle className="float-left text-yellow-400  text-4xl font-headline font-bold uppercase tracking-widest drop-shadow-custom sticky:drop-shadow-none" />
             <div className="clear-both"></div>
           </div>
 
@@ -57,7 +59,28 @@ export const SiteHeader = (props: SiteHeaderProps) => {
           </H1>
 
           <div className="right-4 absolute flex-auto basis-full md:basis-auto  text-center mt-8 mb-8 md:mt-0 md:mb-0 md:flex-initial md:text-right hidden md:block">
-            <DiscordLink />
+            <div className="w-full flex gap-4">
+              <LocalizedClientLink
+                className="hover:text-ui-fg-base"
+                href="/account"
+                data-testid="nav-account-link"
+              >
+                Account
+              </LocalizedClientLink>
+              <Suspense
+                fallback={
+                  <LocalizedClientLink
+                    className="hover:text-ui-fg-base flex gap-2"
+                    href="/cart"
+                    data-testid="nav-cart-link"
+                  >
+                    Cart (0)
+                  </LocalizedClientLink>
+                }
+              >
+                <CartButton />
+              </Suspense>
+            </div>
           </div>
         </Container>
       </div>
