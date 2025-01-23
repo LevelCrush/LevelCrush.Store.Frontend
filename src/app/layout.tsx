@@ -8,8 +8,9 @@ import { H2 } from "@levelcrush/elements/headings";
 import DiscordLink from "@levelcrush/discord_link";
 import AccountProvider, {
   AccountProviderContext,
-} from "@levelcrush/account/account_provider";
+} from "@levelcrush/providers/account_provider";
 import { Suspense } from "react";
+import CartProvider from "@levelcrush/providers/cart_provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -24,9 +25,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             <AccountProvider>
               <OffCanvas>
                 <SiteHeader />
-                <Suspense>
-                  <ProgressBarProvider></ProgressBarProvider>
-                </Suspense>
+                <ProgressBarProvider></ProgressBarProvider>
                 <main className="relative min-h-full flex justify-center items-center">
                   <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center">
                     <H2 className="w-full text-center">We just game.</H2>
@@ -45,13 +44,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <body>
           <Suspense>
             <AccountProvider>
-              <OffCanvas>
-                <SiteHeader />
-                <Suspense>
+              <CartProvider>
+                <OffCanvas>
+                  <SiteHeader />
                   <ProgressBarProvider></ProgressBarProvider>
-                </Suspense>
-                <main className="relative">{props.children}</main>
-              </OffCanvas>
+                  <main className="relative">{props.children}</main>
+                </OffCanvas>
+              </CartProvider>
             </AccountProvider>
           </Suspense>
         </body>

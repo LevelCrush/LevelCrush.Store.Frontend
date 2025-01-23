@@ -4,7 +4,7 @@ import { retrieveCustomer } from "@lib/data/customer";
 import AccountLinkPlatform from "@levelcrush/profile/integrations/accountLinkPlatform";
 import { notFound } from "next/navigation";
 import { useContext } from "react";
-import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 
 export function AccountLinkBook() {
   const { account } = useContext(AccountProviderContext);

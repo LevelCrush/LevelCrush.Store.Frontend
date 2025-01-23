@@ -25,7 +25,7 @@ export interface ButtonProps
 export const Button = (props: ButtonProps) => (
   <button
     {...props}
-    type="button"
+    type={props.type || "button"}
     className={twMerge(
       'block w-full px-4 py-2 rounded transition-all duration-300 ease-in-out ' +
         (() => {

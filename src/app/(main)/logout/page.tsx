@@ -1,4 +1,4 @@
-import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import LogoutHelper from "@levelcrush/account/logout_helper";
 import { H2 } from "@levelcrush/elements/headings";
 import { retrieveCart } from "@lib/data/cart";

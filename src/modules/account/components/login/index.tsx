@@ -1,6 +1,6 @@
 "use client";
 
-import { AccountProviderContext } from "@levelcrush/account/account_provider"
+import { AccountProviderContext } from "@levelcrush/providers/account_provider"
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
