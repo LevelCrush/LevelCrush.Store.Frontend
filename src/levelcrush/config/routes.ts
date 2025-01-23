@@ -20,6 +20,24 @@ export const Routes = [
     name: "Discord Server",
   },
   {
+    url: "#Store",
+    name: "Store",
+    children: [
+      {
+        url: "/cart",
+        name: "Cart",
+      },
+      {
+        url: "/store",
+        name: "Products",
+      },
+      {
+        url: "/products/holiday-gift",
+        name: "Holiday Gift",
+      },
+    ],
+  },
+  {
     url: "#DestinyClans",
     name: "Destiny Clans",
     children: [
@@ -60,24 +78,6 @@ export const Routes = [
       {
         url: "https://engram.blue/crafting",
         name: "Engram.blue",
-      },
-    ],
-  },
-  {
-    url: "#Store",
-    name: "Store",
-    children: [
-      {
-        url: "/cart",
-        name: "Cart",
-      },
-      {
-        url: "/products",
-        name: "Products",
-      },
-      {
-        url: "/products/holiday-gift",
-        name: "Holiday Gift",
       },
     ],
   },

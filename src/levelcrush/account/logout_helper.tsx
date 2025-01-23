@@ -4,7 +4,7 @@ import { H2 } from "@levelcrush/elements/headings";
 import { signout } from "@lib/data/customer";
 import { Button, Container } from "@medusajs/ui";
 import { useContext } from "react";
-import { AccountProviderContext } from "./account_provider";
+import { AccountProviderContext } from "../providers/account_provider";
 import { useRouter } from "next/router";
 import { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
 import { isObject } from "@lib/util/isEmpty";

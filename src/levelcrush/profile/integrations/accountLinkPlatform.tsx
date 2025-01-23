@@ -6,7 +6,7 @@ import { Check, XMark, Link } from "@medusajs/icons";
 import { MetadataType, StoreCustomer } from "@medusajs/types";
 import { Suspense, useContext, useState } from "react";
 import { updateCustomer } from "@lib/data/customer";
-import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import useDeepCompareEffect from "use-deep-compare-effect";
 
 interface BungieValidationResult {
@@ -20,8 +20,12 @@ interface DiscordValidationResult {
   discordHandle: string;
   discordId: string;
   inServer: boolean;
+  email: string;
+  isAdmin: boolean;
+  isModerator: boolean;
+  nicknames: string[];
+  globalName: string;
 }
-
 export type AccountLinkPlatforMetaValueType = "string" | "boolean";
 
 interface AccountLinkPlatformProps {
@@ -86,6 +90,9 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
   }
 
   async function unlinkPlatform() {
+    if (props.platform === "discord") {
+      return;
+    }
     const platformKeys = Object.keys(metadata).filter((v) =>
       v.startsWith(props.platform)
     );
@@ -114,23 +121,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
           clearInterval(intervalHandle);
           const data = await checkPlatformSession();
 
-          if (props.platform == "discord") {
-            const discordValidation = data as DiscordValidationResult;
-            if (
-              discordValidation.discordId &&
-              discordValidation.discordId.length > 0
-            ) {
-              const newMetadata = {} as Record<string, unknown>;
-              newMetadata["discord.id"] = discordValidation.discordId || "";
-              newMetadata["discord.handle"] =
-                discordValidation.discordHandle || "";
-              newMetadata["discord.server_member"] = discordValidation.inServer;
-
-              await updateCustomer({
-                metadata: newMetadata,
-              });
-            }
-          } else if (props.platform == "bungie") {
+          if (props.platform == "bungie") {
             const bungieValidation = data as BungieValidationResult;
             if (
               bungieValidation.membershipId &&
@@ -199,15 +190,20 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       </h3>
       <p className="my-4">{displayName}</p>
       <Button
+        disabled={props.platform === "discord"}
         className="w-full md:w-auto md:min-w-40 text-center"
         variant={accountId.length > 0 ? "danger" : "primary"}
-        onClick={(ev) => {
-          if (accountId && accountId.length > 0) {
-            unlinkPlatform();
-          } else {
-            startLogin();
-          }
-        }}
+        onClick={
+          props.platform !== "discord"
+            ? (ev) => {
+                if (accountId && accountId.length > 0) {
+                  unlinkPlatform();
+                } else {
+                  startLogin();
+                }
+              }
+            : undefined
+        }
       >
         {accountId.length > 0 ? (
           <>

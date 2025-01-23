@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faAngleDoubleRight } from "@fortawesome/free-solid-svg-icons";
 import Hyperlink from "@levelcrush/elements/hyperlink";
 import { H1 } from "@levelcrush/elements/headings";
-import { AccountProviderContext } from "./account/account_provider";
+import { AccountProviderContext } from "./providers/account_provider";
 import useDeepCompareEffect, { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
 import { isObject } from "@lib/util/isEmpty";
 import { signout } from "@lib/data/customer";

@@ -12,7 +12,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { HttpTypes, StoreCustomer } from "@medusajs/types";
 import { signout } from "@lib/data/customer";
 import { useContext } from "react";
-import { AccountProviderContext } from "@levelcrush/account/account_provider";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
 import { isObject } from "lodash";
 

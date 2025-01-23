@@ -7,7 +7,8 @@ import Hyperlink from "./elements/hyperlink";
 import { OffCanvasToggle } from "@levelcrush/offcanvas";
 import DiscordLink from "@levelcrush/discord_link";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import CartButton from "@levelcrush/cart/cart-button";
+import CartButton from "@levelcrush/cart/cart_button";
+import AccountButton from "./account/account_button";
 
 export interface SiteHeaderProps {
   forceStickyStyle?: boolean;
@@ -59,28 +60,7 @@ export const SiteHeader = (props: SiteHeaderProps) => {
           </H1>
 
           <div className="right-4 absolute flex-auto basis-full md:basis-auto  text-center mt-8 mb-8 md:mt-0 md:mb-0 md:flex-initial md:text-right hidden md:block">
-            <div className="w-full flex gap-4">
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/account"
-                data-testid="nav-account-link"
-              >
-                Account
-              </LocalizedClientLink>
-              <Suspense
-                fallback={
-                  <LocalizedClientLink
-                    className="hover:text-ui-fg-base flex gap-2"
-                    href="/cart"
-                    data-testid="nav-cart-link"
-                  >
-                    Cart (0)
-                  </LocalizedClientLink>
-                }
-              >
-                <CartButton />
-              </Suspense>
-            </div>
+            <AccountButton />
           </div>
         </Container>
       </div>
