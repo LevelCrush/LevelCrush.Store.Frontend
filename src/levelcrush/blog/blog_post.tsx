@@ -27,8 +27,8 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
   return (
     <>
       {props.post.image ? (
-        <section className="blogpost-cover">
-          <div className="w-full h-[30rem] relative top-0">
+        <section className="blogpost-cover mb-16">
+          <div className="w-full h-[30rem] relative top-0 ">
             <Image src={props.post.image.url} fill={true} alt="" />
           </div>
         </section>
@@ -41,7 +41,7 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
 
 export function BlogPostTitle(props: BlogPostSectionComponentProps) {
   return (
-    <section className="blogpost-title">
+    <section className="blogpost-title  mb-16">
       <H3>
         <Link href={`/blog/${props.post.slug}`}>{props.post.title}</Link>
       </H3>
@@ -53,7 +53,7 @@ export function BlogPostBody(props: BlogPostSectionComponentProps) {
   return (
     <>
       {props.post.body ? (
-        <section className="blogpost-content">
+        <section className="blogpost-content my-16">
           <PortableBody blocks={props.post.body} />
         </section>
       ) : (
@@ -67,7 +67,7 @@ export function BlogPostShortBody(props: BlogPostSectionComponentProps) {
   return (
     <>
       {props.post.shortBody ? (
-        <section className="blogpost-content-short">
+        <section className="blogpost-content-short my-16">
           <PortableBody blocks={props.post.shortBody} />
         </section>
       ) : (
@@ -79,7 +79,7 @@ export function BlogPostShortBody(props: BlogPostSectionComponentProps) {
 
 export function BlogPostFooter(props: BlogPostSectionComponentProps) {
   return (
-    <footer>
+    <footer className="blogpost-footer mt-16">
       <div>
         <span>Published on </span>
         <time dateTime={props.post.publishedAt}>{props.post.publishedAt}</time>
@@ -100,7 +100,7 @@ export default function BlogPost(props: BlogPostProps) {
   const post = props.post;
   return (
     <ContainerInner>
-      <article className="w-full ">
+      <article className="w-full bg-[rgba(0,0,0,.85)] p-4 md:p-8">
         <BlogPostTitle post={post} />
         <BlogPostCover post={post} />
         <BlogPostShortBody post={post} />

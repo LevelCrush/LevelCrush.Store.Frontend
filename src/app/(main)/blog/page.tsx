@@ -21,7 +21,6 @@ export default async function Blog() {
           _updatedAt
         }`)) as BlogPostListingRecord[] | null | undefined;
 
-  console.log("Blocks", latestPost);
 
   return <BlogList post={latestPost} />;
 }

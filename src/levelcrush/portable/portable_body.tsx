@@ -8,7 +8,7 @@ import {
   PortableTextReactComponents,
   PortableTextTypeComponent,
 } from "@portabletext/react";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/lazy";
 import { PortableTextBlock } from "sanity";
 
 /*
@@ -25,7 +25,16 @@ const customComponents = {
   types: {
     youtube: ({ value }) => {
       const { url } = value;
-      return <ReactPlayer url={url} />;
+      return (
+        <div className="player-wrapper">
+          <ReactPlayer
+            className="react-player"
+            url={url}
+            width="100%"
+            height="100%"
+          />
+        </div>
+      );
     },
   },
 } as Partial<PortableTextReactComponents>;
@@ -35,5 +44,5 @@ export interface PortableBodyProps {
 }
 
 export default function PortableBody(props: PortableBodyProps) {
-  return <PortableText  value={props.blocks} components={customComponents} />;
+  return <PortableText value={props.blocks} components={customComponents} />;
 }
