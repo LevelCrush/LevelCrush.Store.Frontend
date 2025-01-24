@@ -23,9 +23,5 @@ export default async function Blog() {
 
   console.log("Blocks", latestPost);
 
-  return (
-    <ContainerInner>
-      <BlogList post={latestPost} />
-    </ContainerInner>
-  );
+  return <BlogList post={latestPost} />;
 }

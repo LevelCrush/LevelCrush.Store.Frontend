@@ -27,7 +27,7 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
   return (
     <>
       {props.post.image ? (
-        <section>
+        <section className="blogpost-cover">
           <div className="w-full h-[30rem] relative top-0">
             <Image src={props.post.image.url} fill={true} alt="" />
           </div>
@@ -41,7 +41,7 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
 
 export function BlogPostTitle(props: BlogPostSectionComponentProps) {
   return (
-    <section>
+    <section className="blogpost-title">
       <H3>
         <Link href={`/blog/${props.post.slug}`}>{props.post.title}</Link>
       </H3>
@@ -53,8 +53,22 @@ export function BlogPostBody(props: BlogPostSectionComponentProps) {
   return (
     <>
       {props.post.body ? (
-        <section>
+        <section className="blogpost-content">
           <PortableBody blocks={props.post.body} />
+        </section>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+}
+
+export function BlogPostShortBody(props: BlogPostSectionComponentProps) {
+  return (
+    <>
+      {props.post.shortBody ? (
+        <section className="blogpost-content-short">
+          <PortableBody blocks={props.post.shortBody} />
         </section>
       ) : (
         <></>
@@ -85,15 +99,14 @@ export interface BlogPostProps {
 export default function BlogPost(props: BlogPostProps) {
   const post = props.post;
   return (
-    <Container className="top-[4.5rem]">
-      <ContainerInner>
-        <article className="w-full ">
-          <BlogPostTitle post={post} />
-          <BlogPostCover post={post} />
-          <BlogPostBody post={post} />
-          <BlogPostFooter post={post} />
-        </article>
-      </ContainerInner>
-    </Container>
+    <ContainerInner>
+      <article className="w-full ">
+        <BlogPostTitle post={post} />
+        <BlogPostCover post={post} />
+        <BlogPostShortBody post={post} />
+        <BlogPostBody post={post} />
+        <BlogPostFooter post={post} />
+      </article>
+    </ContainerInner>
   );
 }

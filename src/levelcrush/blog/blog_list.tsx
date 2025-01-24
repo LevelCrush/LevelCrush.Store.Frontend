@@ -5,6 +5,7 @@ import React from "react";
 import Container from "@levelcrush/elements/container";
 import Link from "next/link";
 import Image from "next/image";
+import BlogPost from "./blog_post";
 
 export interface BlogPostListingRecord {
   _id: string;
@@ -24,24 +25,10 @@ export interface BlogListProps {
 export default function BlogList(props: BlogListProps) {
   const postings = props.post || [];
   return (
-    <Container className="top-[4.5rem]">
+    <>
       {postings.map((post, key) => (
-        <div key={`blog_list_${post._id}.${key}`}>
-          <H3>
-            <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-          </H3>
-          {post.image ? (
-            <section>
-              <div className="w-full h-[30rem] relative top-0">
-                <Image src={post.image.url} fill={true} alt="" />
-              </div>
-            </section>
-          ) : (
-            <></>
-          )}
-          <PortableBody blocks={post.shortBody} />
-        </div>
+        <BlogPost post={post} key={`blog_list_${post._id}.${key}`} />
       ))}
-    </Container>
+    </>
   );
 }
