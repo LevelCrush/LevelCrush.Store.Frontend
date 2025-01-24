@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { listProducts } from "@lib/data/products";
 import { getRegion, listRegions } from "@lib/data/regions";
 import ProductTemplate from "@modules/products/templates";
+import { client } from "@sanity-cms/lib/client";
 
 /*
 type Props = {
@@ -67,10 +68,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | Medusa Store`,
+    title: `${product.title} | Level Crush`,
     description: `${product.title}`,
     openGraph: {
-      title: `${product.title} | Medusa Store`,
+      title: `${product.title} | Level Crush`,
       description: `${product.title}`,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -95,11 +96,15 @@ export default async function ProductPage(props: Props) {
     notFound();
   }
 
+  // alternatively, you can filter the content by the language
+  const sanity = (await client.getDocument(pricedProduct.id))?.specs[0];
+
   return (
     <ProductTemplate
       product={pricedProduct}
       region={region}
       countryCode={countryCode}
+      sanity={sanity}
     />
   );
 }
