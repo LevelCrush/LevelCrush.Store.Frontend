@@ -99,6 +99,8 @@ export default async function ProductPage(props: Props) {
   // alternatively, you can filter the content by the language
   const sanity = (await client.getDocument(pricedProduct.id))?.specs[0];
 
+  console.log("Intended Sanity", sanity);
+
   return (
     <ProductTemplate
       product={pricedProduct}
