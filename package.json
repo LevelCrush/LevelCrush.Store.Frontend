@@ -39,6 +39,7 @@
     "react-country-flag": "^3.1.0",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-jwt": "^1.2.2",
+    "react-player": "^2.16.0",
     "sanity": "^3.71.2",
     "server-only": "^0.0.1",
     "styled-components": "^6.1.14",
