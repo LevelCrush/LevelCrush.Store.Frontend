@@ -4,11 +4,17 @@ import Container from "@levelcrush/elements/container";
 import { CMSTemplateProps } from "./cms_template";
 import ReactPlayer from "react-player/lazy";
 import ContainerInner from "@levelcrush/elements/container_inner";
+import { H2 } from "@levelcrush/elements/headings";
+import PortableBody from "@levelcrush/portable/portable_body";
+import BlogList, { BlogPostListingRecord } from "@levelcrush/blog/blog_list";
 
 export default function CMSTemplateHome(props: CMSTemplateProps) {
   if (!props.page.template) {
     return <></>;
   }
+
+  const addl = props.additional || {};
+  const posts = (addl.posts as BlogPostListingRecord[] | null | undefined) || [] as BlogPostListingRecord[];
 
   const metadata = props.page.template.metadata || [];
 
@@ -24,28 +30,9 @@ export default function CMSTemplateHome(props: CMSTemplateProps) {
     }
   }
 
-  /*
-        <iframe
-        id="youtubePlayer"
-        width="1920"
-        height="1080"
-        className="w-full h-full fixed top-0 left-0"
-        src={
-          "https://www.youtube-nocookie.com/embed/" +
-          encodeURIComponent(heroSrc) +
-          "?iv_load_policy=3&controls=0&autoplay=1&disablekb=1&fs=0&showinfo=0&rel=0&loop=1&playlist=" +
-          encodeURIComponent(heroSrc) +
-          "&modestbranding=1&playsinline=1&mute=1"
-        }
-        title="Embedded Inline Video Player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      ></iframe>
-  */
-
   return (
     <>
-      <div className="top-[-4.5rem] relative max-w-[240rem] mx-auto">
+      <div className="top-[-4.5rem] relative max-w-[240rem] mx-auto border-b-8 border-solid border-cyan-400 shadow-[0px_.5rem_.5rem_2px_rgba(0,0,0,0.7)]">
         <div className="player-wrapper">
           <ReactPlayer
             className="react-player"
@@ -72,7 +59,13 @@ export default function CMSTemplateHome(props: CMSTemplateProps) {
           />
         </div>
       </div>
-      <ContainerInner></ContainerInner>
+      <ContainerInner>
+        <div className="w-full bg-[rgba(0,0,0,.85)] md:p-8">
+          <H2>{props.page.title}</H2>
+          <PortableBody blocks={props.page.body} />
+        </div>
+      </ContainerInner>
+      <BlogList post={posts} />
     </>
   );
 }

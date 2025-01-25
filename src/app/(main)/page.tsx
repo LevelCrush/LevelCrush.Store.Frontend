@@ -26,5 +26,14 @@ export default async function Home() {
     notFound();
   }
 
-  return <CMSPage page={page} />;
+  const latestPost = await cms.blogPaginate();
+
+  return (
+    <CMSPage
+      page={page}
+      additional={{
+        posts: latestPost,
+      }}
+    />
+  );
 }

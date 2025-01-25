@@ -19,6 +19,7 @@ export interface CMSPageRecord {
 
 export interface CMSPageProps {
   page: CMSPageRecord;
+  additional?: Record<any,any>
 }
 
 export default function CMSPage(props: CMSPageProps) {
@@ -26,9 +27,9 @@ export default function CMSPage(props: CMSPageProps) {
     const slug = props.page.template.slug.toLowerCase();
 
     if (slug == "home") {
-      return <CMSTemplateHome page={props.page} />;
+      return <CMSTemplateHome {...props} />;
     }
   }
 
-  return <CMSTemplate page={props.page} />;
+  return <CMSTemplate {...props} />;
 }
