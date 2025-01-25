@@ -1,5 +1,6 @@
 import { BlogPostListingRecord } from "@levelcrush/blog/blog_list";
 import BlogPost, { BlogPostRecord } from "@levelcrush/blog/blog_post";
+import cms from "@levelcrush/cms";
 import { client } from "@sanity-cms/lib/client";
 import { notFound } from "next/navigation";
 
@@ -15,18 +16,7 @@ export default async function BlogPage(props: Props) {
     notFound();
   }
 
-  const posts =
-    (await client.fetch(`*[_type == "post" && slug.current == "${slug}"] {
-    _id,
-    title,
-    "image": image.asset->,
-    "slug": slug.current,
-    body,
-    publishedAt,
-    _createdAt,
-    _updatedAt
-    }`)) as BlogPostRecord[];
-  const post = (posts || []).at(0);
+  const post = await cms.blog(slug);
   if (!post) {
     notFound();
   }
