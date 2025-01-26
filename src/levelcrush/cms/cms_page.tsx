@@ -12,6 +12,7 @@ export interface CMSPageRecord {
   tabName: string;
   categories: unknown[];
   route: string;
+  hero: string | null;
   body: PortableTextBlock;
   template: {
     slug: string;

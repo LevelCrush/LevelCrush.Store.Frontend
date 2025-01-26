@@ -50,6 +50,7 @@ export async function page(route: string = "/") {
           id, 
           metaDescription,
           tabName,
+          "hero" : hero.asset->url,
           "categories": categories[] {
                   _type == 'reference' => @-> {
                       title,
@@ -69,7 +70,7 @@ export async function page(route: string = "/") {
 }
 
 export async function menu(id: string = "") {
-  const menu = await client.fetch(
+  const menu = (await client.fetch(
     `
     *[ _type == "menu" && slug.current == $menu][0] {
       title,
@@ -102,8 +103,8 @@ export async function menu(id: string = "") {
     `,
     {
       menu: id,
-    },
-  ) as MenuRecord | null;
+    }
+  )) as MenuRecord | null;
 
   return menu;
 }
@@ -112,7 +113,7 @@ export const cms = {
   blog,
   blogPaginate,
   page,
-  menu
+  menu,
 };
 
 export default cms;
