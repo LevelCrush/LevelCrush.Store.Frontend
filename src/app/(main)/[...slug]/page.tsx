@@ -8,7 +8,7 @@ type Props = {
 }
 
 
-/*
+/* Maybe look into this? 
 export async function generateStaticParams() {
   
   const staticParams = countryCodes
