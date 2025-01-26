@@ -8,6 +8,8 @@ import CMSTemplateHome from "./templates/cms_template_home";
 export interface CMSPageRecord {
   id: string;
   title: string;
+  metaDescription: string;
+  tabName: string;
   categories: unknown[];
   route: string;
   body: PortableTextBlock;
@@ -19,7 +21,7 @@ export interface CMSPageRecord {
 
 export interface CMSPageProps {
   page: CMSPageRecord;
-  additional?: Record<any,any>
+  additional?: Record<any, any>;
 }
 
 export default function CMSPage(props: CMSPageProps) {

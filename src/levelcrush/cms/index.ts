@@ -48,6 +48,8 @@ export async function page(route: string = "/") {
       {
           title,
           id, 
+          metaDescription,
+          tabName,
           "categories": categories[] {
                   _type == 'reference' => @-> {
                       title,
