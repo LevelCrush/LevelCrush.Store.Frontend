@@ -22,6 +22,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "cdn.sanity.io"
+      },
+      {
+        protocol: "https",
         hostname: "levelcrush.com.s3.us-east-1.amazonaws.com"
       },
       {

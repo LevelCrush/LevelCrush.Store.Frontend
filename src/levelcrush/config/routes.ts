@@ -24,16 +24,12 @@ export const Routes = [
     name: "Store",
     children: [
       {
-        url: "/cart",
-        name: "Cart",
-      },
-      {
-        url: "/store",
-        name: "Products",
-      },
-      {
-        url: "/products/holiday-gift",
+        url: "/holiday-gift",
         name: "Holiday Gift",
+      },
+      {
+        url: "/gift-cards",
+        name: "Gift Cards",
       },
     ],
   },
