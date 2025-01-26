@@ -12,11 +12,7 @@ export const metadata: Metadata = {
   description: "View your profile integrations",
 };
 
-export default async function Integrations(props: {
-  params: Promise<{ countryCode: string }>;
-}) {
-  const params = await props.params;
-  const { countryCode } = params;
+export default async function Integrations() {
   const customer = await retrieveCustomer();
 
   if (!customer) {
