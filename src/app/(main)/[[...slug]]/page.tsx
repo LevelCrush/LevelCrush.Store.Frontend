@@ -1,5 +1,5 @@
 import cms from "@levelcrush/cms";
-import CMSPage from "@levelcrush/cms/cms_page";
+import CMSPage, { CMSPageProps } from "@levelcrush/cms/cms_page";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -27,8 +27,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   try {
     const params = await props.params;
+    const slugs = params.slug || [];
    // const slug = params.cmsSlug1 || "";
-    const route = `/${params.slug.join("/")}`;
+    const route = `/${slugs.join("/")}`;
     const title = "Teehee";
     const description = "Description";
 
@@ -47,14 +48,24 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function FallbackPage(props: Props) {
   const params = await props.params;
-  const route = `/${params.slug.join("/")}`;
+  const slugs = params.slug || [];
+  const route = `/${slugs.join("/")}`;
 
   const page = await cms.page(route);
-  console.log(page, typeof page);
   if(!page) {
     notFound();
   }
 
+  let cmsProps = {
+    page: page,
+    additional: {}
+  } as CMSPageProps;
 
-  return <CMSPage page={page} />
+  if(route == '/' && cmsProps.additional) { 
+      const latestPost = await cms.blogPaginate();
+      cmsProps.additional['posts'] = latestPost;
+  }
+
+
+  return <CMSPage {...cmsProps} />
 }
