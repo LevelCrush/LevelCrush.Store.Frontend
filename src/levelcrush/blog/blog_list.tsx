@@ -27,7 +27,11 @@ export default function BlogList(props: BlogListProps) {
   return (
     <>
       {postings.map((post, key) => (
-        <BlogPost post={post} key={`blog_list_${post._id}.${key}`} />
+        <BlogPost
+          showLink={true}
+          post={post}
+          key={`blog_list_${post._id}.${key}`}
+        />
       ))}
     </>
   );

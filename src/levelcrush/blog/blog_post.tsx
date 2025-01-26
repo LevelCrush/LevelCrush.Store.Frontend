@@ -6,6 +6,7 @@ import Container from "@levelcrush/elements/container";
 import Link from "next/link";
 import Image from "next/image";
 import ContainerInner from "@levelcrush/elements/container_inner";
+import Button from "@levelcrush/elements/button";
 
 export interface BlogPostRecord {
   _id: string;
@@ -21,6 +22,7 @@ export interface BlogPostRecord {
 
 export interface BlogPostSectionComponentProps {
   post: BlogPostRecord;
+  showLink?: boolean;
 }
 
 export function BlogPostCover(props: BlogPostSectionComponentProps) {
@@ -42,9 +44,20 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
 export function BlogPostTitle(props: BlogPostSectionComponentProps) {
   return (
     <section className="blogpost-title  mb-16">
-      <H3>
+      <H3 className={"text-yellow-400 underline hover:text-white"}>
         <Link href={`/blog/${props.post.slug}`}>{props.post.title}</Link>
       </H3>
+      {props.showLink ? (
+        <Button
+          className={"w-full md:w-auto min-w-[10rem]"}
+          href={`/blog/${props.post.slug}`}
+          intention={"normal"}
+        >
+          View Post
+        </Button>
+      ) : (
+        <></>
+      )}
     </section>
   );
 }
@@ -97,15 +110,14 @@ export interface BlogPostProps {
 }
 
 export default function BlogPost(props: BlogPostProps) {
-  const post = props.post;
   return (
     <ContainerInner>
       <article className="w-full px-4">
-        <BlogPostTitle post={post} />
-        <BlogPostCover post={post} />
-        <BlogPostShortBody post={post} />
-        <BlogPostBody post={post} />
-        <BlogPostFooter post={post} />
+        <BlogPostTitle {...props} />
+        <BlogPostCover {...props} />
+        <BlogPostShortBody {...props} />
+        <BlogPostBody {...props} />
+        <BlogPostFooter {...props} />
       </article>
     </ContainerInner>
   );
