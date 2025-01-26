@@ -100,7 +100,7 @@ export default function BlogPost(props: BlogPostProps) {
   const post = props.post;
   return (
     <ContainerInner>
-      <article className="w-full bg-[rgba(0,0,0,.85)] p-4 md:p-8">
+      <article className="w-full px-4">
         <BlogPostTitle post={post} />
         <BlogPostCover post={post} />
         <BlogPostShortBody post={post} />

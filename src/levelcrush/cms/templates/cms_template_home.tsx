@@ -60,7 +60,7 @@ export default function CMSTemplateHome(props: CMSTemplateProps) {
         </div>
       </div>
       <ContainerInner>
-        <div className="w-full bg-[rgba(0,0,0,.85)] md:p-8">
+        <div className="w-full px-4">
           <H2>{props.page.title}</H2>
           <PortableBody blocks={props.page.body} />
         </div>
