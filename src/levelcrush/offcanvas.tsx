@@ -7,7 +7,9 @@ import { faBars, faAngleDoubleRight } from "@fortawesome/free-solid-svg-icons";
 import Hyperlink from "@levelcrush/elements/hyperlink";
 import { H1 } from "@levelcrush/elements/headings";
 import { AccountProviderContext } from "./providers/account_provider";
-import useDeepCompareEffect, { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
+import useDeepCompareEffect, {
+  useDeepCompareEffectNoCheck,
+} from "use-deep-compare-effect";
 import { isObject } from "@lib/util/isEmpty";
 import { signout } from "@lib/data/customer";
 
@@ -81,14 +83,15 @@ export const OffCanvasToggle = (props: OffCanvasToggleProps) => (
  * @constructor
  */
 export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
-
   const { account } = useContext(AccountProviderContext);
 
-  const [showing, setShowing] = useState(false);
   const [routes, setRoutes] = useState(props.routes || Routes);
+
+  const [showing, setShowing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMember, setIsMember] = useState(isObject(account));
 
+  console.log(account, isObject(account));
 
   const eventCanvasToggle = () => {
     dispatchEvent(showing ? "offcanvas_hide" : "offcanvas_show");
@@ -119,7 +122,6 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
     };
   }, []);
 
-
   useDeepCompareEffectNoCheck(() => {
     setIsMember(isObject(account));
   }, [account]);
@@ -131,6 +133,8 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
         data-showing={showing ? "1" : "0"}
       >
         <nav
+          data-member={isMember}
+          data-admin={isAdmin}
           data-offcanvas="main"
           className="offcanvas-menu bg-gradient-to-b from-white  to-slate-300 dark:bg-slate-900 dark:from-slate-800 dark:to-slate-900   shadow-[0px_1rem_1rem_2px_rgba(0,0,0,0.7)] border-r-cyan-400 border-r-2 border-r-solid bg-black text-black dark:text-white fixed z-[99999] top-0 -translate-x-full offcanvas-opened:-translate-x-0 w-[20rem]  transition-all duration-300 h-screen overflow-auto"
         >
@@ -145,10 +149,20 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
           <ul className="text-white font-bold">
             {(routes || []).map((routeItem, routeItemIndex) => {
               if (routeItem.loginOnly && isMember === false) {
-                return <li className="hidden login-route"  key={"routeitem_" + routeItemIndex + "_" + routeItem.url}></li>
+                return (
+                  <li
+                    className="hidden login-route"
+                    key={"routeitem_" + routeItemIndex + "_" + routeItem.url}
+                  ></li>
+                );
               }
               if (routeItem.adminOnly && isAdmin === false) {
-                return <li className="hidden admin-route"  key={"routeitem_" + routeItemIndex + "_" + routeItem.url}></li>
+                return (
+                  <li
+                    className="hidden admin-route"
+                    key={"routeitem_" + routeItemIndex + "_" + routeItem.url}
+                  ></li>
+                );
               }
 
               return (
@@ -176,13 +190,13 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                               }
                             }
                           }
-                        : routeItem.signout 
-                          ? (ev) => {
+                        : routeItem.signout
+                        ? (ev) => {
                             ev.preventDefault();
                             signout("us");
                             return false;
                           }
-                          : undefined
+                        : undefined
                     }
                   >
                     {(routeItem.children || []).length > 0 ? (
@@ -222,13 +236,14 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                             <Hyperlink
                               className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-transparent dark:hover:bg-opacity-10 transition duration-300"
                               href={subChild.url}
-                              onClick={routeItem.signout 
-                                ? (ev) => {
-                                  ev.preventDefault();
-                                  signout("us");
-                                  return false;
-                                }
-                                : undefined
+                              onClick={
+                                routeItem.signout
+                                  ? (ev) => {
+                                      ev.preventDefault();
+                                      signout("us");
+                                      return false;
+                                    }
+                                  : undefined
                               }
                             >
                               <span className="block border-l-2  border-solid border-black dark:border-cyan-500 pl-4">

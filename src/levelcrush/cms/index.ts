@@ -2,6 +2,7 @@ import { BlogPostListingRecord } from "@levelcrush/blog/blog_list";
 import { BlogPostRecord } from "@levelcrush/blog/blog_post";
 import { client } from "@sanity-cms/lib/client";
 import { CMSPageRecord } from "./cms_page";
+import { MenuRecord } from "@levelcrush/menu";
 
 export async function blog(slug: string) {
   const posts = (await client.fetch(
@@ -42,7 +43,7 @@ export async function blogPaginate(
 }
 
 export async function page(route: string = "/") {
-  const pages = await client.fetch(
+  const pages = (await client.fetch(
     `*[_type == "page" && route.current == $route] 
       {
           title,
@@ -59,16 +60,57 @@ export async function page(route: string = "/") {
     {
       route,
     }
-  ) as CMSPageRecord[] | null | undefined;
+  )) as CMSPageRecord[] | null | undefined;
 
   const page = (pages || []).at(0);
   return page;
+}
+
+export async function menu(id: string = "") {
+  const menu = await client.fetch(
+    `
+    *[ _type == "menu" && slug.current == $menu][0] {
+      title,
+      url, 
+      "loginOnly": coalesce(loginOnly, false),
+      "slug" : slug.current, 
+      "links": *[ _type == "menu-link" && parent._ref  == ^._id && visible == true] | order(order asc) {
+        title, 
+        url,
+        "id" : id.current,
+        order,
+        "loginOnly": coalesce(loginOnly, false),
+      },
+      "submenus" : * [ _type == "menu" && parent._ref == ^._id && visible == true] | order(order asc) {
+          title,
+          url, 
+          "slug" : slug.current, 
+          "links": *[ _type == "menu-link" && parent._ref  == ^._id && visible == true] | order(order asc) {
+            title, 
+            url,
+            "id" : id.current,
+            order,
+            "loginOnly": coalesce(loginOnly, false),
+          },
+          "submenus" : [],
+          order,
+          "loginOnly": coalesce(loginOnly, false),
+      }
+    }
+    `,
+    {
+      menu: id,
+    },
+  ) as MenuRecord | null;
+
+  return menu;
 }
 
 export const cms = {
   blog,
   blogPaginate,
   page,
+  menu
 };
 
 export default cms;

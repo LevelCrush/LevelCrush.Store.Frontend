@@ -5,9 +5,6 @@ import Container from "./elements/container";
 import { H1 } from "./elements/headings";
 import Hyperlink from "./elements/hyperlink";
 import { OffCanvasToggle } from "@levelcrush/offcanvas";
-import DiscordLink from "@levelcrush/discord_link";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import CartButton from "@levelcrush/cart/cart_button";
 import AccountButton from "./account/account_button";
 
 export interface SiteHeaderProps {

@@ -20,20 +20,6 @@ export const Routes = [
     name: "Discord Server",
   },
   {
-    url: "#Store",
-    name: "Store",
-    children: [
-      {
-        url: "/holiday-gift",
-        name: "Holiday Gift",
-      },
-      {
-        url: "/gift-cards",
-        name: "Gift Cards",
-      },
-    ],
-  },
-  {
     url: "#DestinyClans",
     name: "Destiny Clans",
     children: [
