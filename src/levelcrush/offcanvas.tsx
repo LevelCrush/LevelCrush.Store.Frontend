@@ -172,7 +172,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                 >
                   <Hyperlink
                     className="p-4 block hover:bg-black hover:bg-opacity-10 dark:hover:bg-transparent dark:hover:bg-opacity-10 transition duration-300"
-                    href={routeItem.url}
+                    href={(routeItem.children || []).length > 0 ? `#${encodeURIComponent(routeItem.url)}` : routeItem.url}
                     data-has-sub={
                       (routeItem.children || []).length > 0 ? "1" : "0"
                     }
@@ -191,7 +191,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                             }
                           }
                         : routeItem.signout
-                        ? (ev) => {
+                          ? (ev) => {
                             ev.preventDefault();
                             signout("us");
                             return false;
