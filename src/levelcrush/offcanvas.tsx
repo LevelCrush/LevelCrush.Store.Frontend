@@ -177,7 +177,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
                       (routeItem.children || []).length > 0 ? "1" : "0"
                     }
                     onClick={
-                      routeItem.children
+                      (routeItem.children || []).length > 0
                         ? (ev) => {
                             if (ev.target) {
                               const closetLi = (

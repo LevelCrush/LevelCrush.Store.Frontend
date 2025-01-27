@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player/lazy";
 
 export interface HeroProps {
@@ -10,6 +10,13 @@ export interface HeroProps {
 }
 
 export default function Hero(props: React.PropsWithChildren<HeroProps>) {
+  const [hasWindow, setHasWindow] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasWindow(true);
+    }
+  }, []);
+
   return (
     <div
       className={
@@ -21,7 +28,7 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
         minHeight: "25rem",
       }}
     >
-      {props.youtubeUrl ? (
+      {props.youtubeUrl && hasWindow ? (
         <>
           <div className="absolute top-0 left-0 bg-black opacity-[.65] w-full h-full"></div>
           <div className="player-wrapper w-full">
