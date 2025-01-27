@@ -77,5 +77,6 @@ export interface PortableBodyProps {
 }
 
 export default function PortableBody(props: PortableBodyProps) {
+  
   return <PortableText value={props.blocks} components={customComponents} />;
 }

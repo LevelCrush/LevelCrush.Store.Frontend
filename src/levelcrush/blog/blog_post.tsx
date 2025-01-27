@@ -1,3 +1,5 @@
+"use client";
+
 import { H1, H3 } from "@levelcrush/elements/headings";
 import PortableBody from "@levelcrush/portable/portable_body";
 import { ImageAsset, PortableTextBlock } from "sanity";
@@ -7,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ContainerInner from "@levelcrush/elements/container_inner";
 import Button from "@levelcrush/elements/button";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export interface BlogPostRecord {
   _id: string;
@@ -44,6 +46,8 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
 
 export function BlogPostTitle(props: BlogPostSectionComponentProps) {
 
+  const router = useRouter();
+  
   return (
     <section className="blogpost-title  mb-16">
       <H3 className={"text-yellow-400 underline hover:text-white"}>
@@ -53,7 +57,10 @@ export function BlogPostTitle(props: BlogPostSectionComponentProps) {
         <Button
           className={"w-full md:w-auto min-w-[10rem]"}
           onClick={(ev) => {
-            redirect(`/blog/${props.post.slug}`);
+            ev.preventDefault();
+            const redirect = `/blog/${props.post.slug}`;
+            router.push(redirect);
+            return false;
           }}
           intention={"normal"}
         >
