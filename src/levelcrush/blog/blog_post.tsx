@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ContainerInner from "@levelcrush/elements/container_inner";
 import Button from "@levelcrush/elements/button";
+import { redirect } from "next/navigation";
 
 export interface BlogPostRecord {
   _id: string;
@@ -42,6 +43,7 @@ export function BlogPostCover(props: BlogPostSectionComponentProps) {
 }
 
 export function BlogPostTitle(props: BlogPostSectionComponentProps) {
+
   return (
     <section className="blogpost-title  mb-16">
       <H3 className={"text-yellow-400 underline hover:text-white"}>
@@ -50,7 +52,9 @@ export function BlogPostTitle(props: BlogPostSectionComponentProps) {
       {props.showLink ? (
         <Button
           className={"w-full md:w-auto min-w-[10rem]"}
-          href={`/blog/${props.post.slug}`}
+          onClick={(ev) => {
+            redirect(`/blog/${props.post.slug}`);
+          }}
           intention={"normal"}
         >
           View Post
@@ -107,6 +111,7 @@ export function BlogPostFooter(props: BlogPostSectionComponentProps) {
 
 export interface BlogPostProps {
   post: BlogPostRecord;
+  showLink: boolean;
 }
 
 export default function BlogPost(props: BlogPostProps) {
