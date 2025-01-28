@@ -10,6 +10,8 @@ import { decodeToken } from "react-jwt";
 
 import { useCookies } from "next-client-cookies";
 import { updateCustomer } from "@lib/data/customer";
+import Hyperlink from "@levelcrush/elements/hyperlink";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 
 interface DiscordValidationResult {
   discordHandle: string;
@@ -25,6 +27,7 @@ interface DiscordValidationResult {
 export default function LoginHelper() {
   const cookies = useCookies();
   const [loading, setLoading] = useState(false);
+  const { account } = useContext(AccountProviderContext);
 
   const router = useRouter();
 
@@ -61,6 +64,10 @@ export default function LoginHelper() {
 
           body: JSON.stringify({
             email: email,
+            company_name: "",
+            first_name: metadata["discord.globalName"],
+            last_name: "",
+            phone: "",
             metadata: metadata,
           }),
         }
@@ -137,7 +144,7 @@ export default function LoginHelper() {
       });
 
       window.localStorage.setItem("medusa_jwt", token);
-      
+
       const metadata = {
         "discord.id": sessionJson.discordId,
         "discord.handle": sessionJson.discordHandle,
@@ -150,13 +157,14 @@ export default function LoginHelper() {
       };
 
       await updateCustomer({
-    
-        metadata: metadata
+        first_name: metadata["discord.globalName"],
+        last_name: (account && account.last_name) ? account.last_name : "",
+        phone: (account && account.phone) ? account.phone : "",
+        company_name: (account && account.company_name) ? account.company_name : "",
+        metadata: metadata,
       });
 
-
       router.push("/");
-      
 
       //window.location.href = "/";
     } catch (err) {
@@ -173,7 +181,8 @@ export default function LoginHelper() {
 
   return (
     <Container className="top-[4.5rem]">
-      <H2>Fancy seeing you here. </H2>
+      <H2 className="text-center">Fancy seeing you here. You'll be moved along eventually.</H2>
+      <p className="text-center">Otherwise click <Hyperlink href="/">here</Hyperlink></p>
     </Container>
   );
 }
