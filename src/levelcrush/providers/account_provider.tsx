@@ -28,7 +28,6 @@ export function AccountProvider(props: React.PropsWithChildren<{}>) {
     setIsLoading(true);
 
     try {
-        console.log("Updating account");
         const acc = await retrieveCustomer("no-store");
         setAccount(acc);
     } catch(err) {

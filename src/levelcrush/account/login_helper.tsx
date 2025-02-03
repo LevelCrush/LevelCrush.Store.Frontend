@@ -22,6 +22,8 @@ interface DiscordValidationResult {
   isModerator: boolean;
   nicknames: string[];
   globalName: string;
+  isBooster: boolean;
+  isRetired: boolean;
 }
 
 export default function LoginHelper() {
@@ -111,6 +113,8 @@ export default function LoginHelper() {
         credentials: "include",
       });
 
+
+    
       var sessReq = await fetch(
         `${
           process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"] || ""
@@ -123,12 +127,15 @@ export default function LoginHelper() {
 
       const data = await res.json();
       const token = data.token;
-      const decoded = decodeToken(token);
+      const decoded = decodeToken(token)
+      console.log(decoded);
       const sessionJson = (await sessReq.json()) as DiscordValidationResult;
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
 
       if (shouldCreateCustomer) {
+        console.log("Sending", sessionJson.email);
+
         await createCustomer(token, sessionJson.email, sessionJson);
         await refreshToken(token);
       }
@@ -153,14 +160,18 @@ export default function LoginHelper() {
         "discord.nicknames": sessionJson.nicknames,
         "discord.admin": sessionJson.isAdmin,
         "discord.moderator": sessionJson.isModerator,
+        "discord.booster": sessionJson.isBooster,
+        "discord.retired": sessionJson.isRetired,
         "discord.email": sessionJson.email,
+        
       };
 
       await updateCustomer({
         first_name: metadata["discord.globalName"],
-        last_name: (account && account.last_name) ? account.last_name : "",
-        phone: (account && account.phone) ? account.phone : "",
-        company_name: (account && account.company_name) ? account.company_name : "",
+        last_name: account && account.last_name ? account.last_name : "",
+        phone: account && account.phone ? account.phone : "",
+        company_name:
+          account && account.company_name ? account.company_name : "",
         metadata: metadata,
       });
 
@@ -181,8 +192,12 @@ export default function LoginHelper() {
 
   return (
     <Container className="top-[4.5rem]">
-      <H2 className="text-center">Fancy seeing you here. You'll be moved along eventually.</H2>
-      <p className="text-center">Otherwise click <Hyperlink href="/">here</Hyperlink></p>
+      <H2 className="text-center">
+        Fancy seeing you here. You'll be moved along eventually.
+      </H2>
+      <p className="text-center">
+        Otherwise click <Hyperlink href="/">here</Hyperlink>
+      </p>
     </Container>
   );
 }

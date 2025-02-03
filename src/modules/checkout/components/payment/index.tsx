@@ -41,7 +41,6 @@ const Payment = ({
   console.log(selectedPaymentMethod);
   const isStripe = isStripeFunc(selectedPaymentMethod);
   const stripeReady = useContext(StripeContext);
-  console.log("Stripe Ready", stripeReady);
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;

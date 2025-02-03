@@ -91,8 +91,6 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMember, setIsMember] = useState(isObject(account));
 
-  console.log(account, isObject(account));
-
   const eventCanvasToggle = () => {
     dispatchEvent(showing ? "offcanvas_hide" : "offcanvas_show");
   };
