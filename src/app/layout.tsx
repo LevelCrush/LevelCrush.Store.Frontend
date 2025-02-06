@@ -13,6 +13,8 @@ import { Suspense } from "react";
 import CartProvider from "@levelcrush/providers/cart_provider";
 import cms from "@levelcrush/cms";
 import { RouteItem } from "@levelcrush/config/routes";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -50,6 +52,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   if (process.env.FORCE_CONSTRUCTION === "true" || false) {
     return (
       <html lang="en" data-mode="dark" className="dark">
+        <GoogleAnalytics gaId={process.env["NEXT_PUBLIC_GTAG"] || ""} />
         <body>
           <Suspense>
             <AccountProvider>

@@ -24,7 +24,7 @@ const Modal = ({
 }: ModalProps) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-[75]" onClose={close}>
+      <Dialog  as="div" className="relative z-[75]" onClose={close}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -64,8 +64,8 @@ const Modal = ({
                     "max-w-md": size === "small",
                     "max-w-xl": size === "medium",
                     "max-w-3xl": size === "large",
-                    "bg-transparent shadow-none": search,
-                    "bg-transparent shadow-xl border rounded-rounded": !search,
+                    "bg-black shadow-none": search,
+                    "bg-black shadow-xl border rounded-rounded": !search,
                   }
                 )}
               >

@@ -25,9 +25,10 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
       }
       style={{
         backgroundImage: `url(${props.backgroundUrl || "/hero.jpg"})`,
-        minHeight: "25rem",
+        minHeight: "30rem",
       }}
     >
+      
       {props.youtubeUrl && hasWindow ? (
         <>
           <div className="absolute top-0 left-0 bg-black opacity-[.65] w-full h-full"></div>
@@ -41,6 +42,7 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
               width="100%"
               height="100%"
               loop={true}
+      
               config={{
                 youtube: {
                   embedOptions: {

@@ -4,6 +4,7 @@ import { HOLIDAY_GIFTS_2024 } from "@levelcrush/skus";
 import { sdk } from "@lib/config";
 import {
   addToCart,
+  deleteLineItem,
   getOrSetCart,
   initiatePaymentSession,
   listCartOptions,
@@ -26,17 +27,66 @@ import {
 } from "@medusajs/types";
 import ShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge";
 import { match } from "assert";
+import { error } from "console";
 import { revalidateTag } from "next/cache";
 
-export async function orderHolidayGift(formData: FormData, sku: string) {
+
+export async function clearCart() { 
+  
+  const cart = await getOrSetCart("us");
+  const items = cart.items || [];
+  for(const item of items) {
+    await deleteLineItem(item.id);
+  }
+}
+
+export async function orderHolidayGift(formData: FormData) {
   const region = await getRegion("us");
   if (!region) {
     throw new Error(`Region not found for country code: us`);
   }
 
+  // make sure the cart is clear
+  await clearCart();
+
   const headers = {
     ...(await getAuthHeaders()),
   };
+
+  const customer = await retrieveCustomer();
+  const metadata = customer?.metadata  || {};
+  if(!metadata["discord.id"]) {
+    throw new Error("No linked discord");
+  }
+
+  if(!metadata["discord.server_member"]) {
+    throw new Error("Not in discord server");
+  
+  }
+
+  if(!metadata["bungie.id"]) {
+    throw new Error("No linked bungie");
+  }
+
+  if(!metadata["bungie.clan_member"])  {
+    throw new Error("Not a clan member");
+  }
+  
+  let sku = "";
+  if(metadata["discord.admin"] === true) {
+    sku = HOLIDAY_GIFTS_2024.ACTIVE_FOUNDER;
+  } else if(metadata["discord.retired"] === true) {
+    sku = HOLIDAY_GIFTS_2024.RETIRED_FOUNDER;
+  } else if(metadata["discord.booster"] === true) {
+    sku = HOLIDAY_GIFTS_2024.SERVER_BOOSTER;
+  } else {
+    sku = HOLIDAY_GIFTS_2024.NORMAL;
+  }
+
+  if(!sku) {
+    throw new Error("No Gift Sku could be found");
+  }
+
 
   // get holiday gift skus
   const d2ProductRequest = await listProducts({
@@ -105,7 +155,12 @@ export async function orderHolidayGift(formData: FormData, sku: string) {
 
   const targetSeals = [] as StoreProductVariant[];
   for (const variant of d2Seals.variants) {
-    if (seals.includes(variant.title || "")) {
+    const variantOptions = variant.options || [];
+    const titleOption = variantOptions.find(
+      (opt) => opt.option?.title === "Seal"
+    );
+
+    if (seals.includes(titleOption?.value || "")) {
       targetSeals.push(variant);
     }
   }
@@ -278,7 +333,6 @@ export async function orderHolidayGift(formData: FormData, sku: string) {
   const selectedAddress = (formData.get("selectedAddress") as string) || "";
   console.warn("SELECTED ADDRESS: ", selectedAddress);
   if (selectedAddress.trim().length > 0 && selectedAddress !== "on") {
-
     console.log("Address", selectedAddress);
     const matchedAddress = account.addresses.find(
       (v) => v.id === selectedAddress
@@ -356,4 +410,10 @@ export async function orderHolidayGift(formData: FormData, sku: string) {
   await placeOrder(cart.id);
 
   console.log("Done placing order!");
+  const err = "";
+  return {
+    success: true,
+    error: err,
+    response: {},
+  };
 }

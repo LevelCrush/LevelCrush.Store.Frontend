@@ -20,7 +20,8 @@
       "@modules/*": ["modules/*"],
       "@pages/*": ["pages/*"],
       "@levelcrush/*": ["levelcrush/*"],
-      "@sanity-cms/*" : ["sanity-cms/*"]
+      "@sanity-cms/*" : ["sanity-cms/*"],
+      "@next/third-parties/google": ["node_modules/@next/third-parties/dist/google"]
     },
     "plugins": [
       {

@@ -9,6 +9,7 @@ import Link from "next/link";
 import CheckoutHolidayGift from "@levelcrush/checkout/checkout_holiday_gift";
 import { getRegion } from "@lib/data/regions";
 import { notFound } from "next/navigation";
+import cms from "@levelcrush/cms";
 
 export const metadata: Metadata = {
   title: "Holiday Gift 2024 | Level Crush",
@@ -79,7 +80,7 @@ export default async function HolidayGiftPage() {
   const account = await retrieveCustomer();
   const region = await getRegion("us");
 
-  if(!region) { 
+  if (!region) {
     notFound();
   }
 
@@ -102,5 +103,7 @@ export default async function HolidayGiftPage() {
     return LinkBungie();
   }
 
-  return <CheckoutHolidayGift region={region} customer={account} />;
+  const page = await cms.page("/holiday-gift");
+
+  return <CheckoutHolidayGift region={region} customer={account} page={page} />;
 }
