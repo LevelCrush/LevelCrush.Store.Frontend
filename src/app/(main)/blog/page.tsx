@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Blog() {
+  notFound();
   const latestPost = await cms.blogPaginate();
   return <BlogList post={latestPost} />;
 }

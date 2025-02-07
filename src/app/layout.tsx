@@ -15,7 +15,6 @@ import cms from "@levelcrush/cms";
 import { RouteItem } from "@levelcrush/config/routes";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 
-
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
 };
@@ -75,6 +74,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     return (
       <html lang="en" data-mode="dark" className="dark">
         <body>
+          <GoogleAnalytics gaId={process.env["NEXT_PUBLIC_GTAG"] || ""} />
           <Suspense>
             <AccountProvider>
               <CartProvider>

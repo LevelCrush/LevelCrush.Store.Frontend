@@ -6,6 +6,7 @@ import Container from "@levelcrush/elements/container";
 import Link from "next/link";
 import Image from "next/image";
 import BlogPost from "./blog_post";
+import { notFound } from "next/navigation";
 
 export interface BlogPostListingRecord {
   _id: string;

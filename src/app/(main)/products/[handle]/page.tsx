@@ -15,6 +15,9 @@ type Props = {
 };
 
 export async function generateStaticParams() {
+  // for now we are hiding this page
+  notFound();
+
   try {
     const countryCodes = await listRegions().then((regions) =>
       regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
@@ -49,6 +52,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
+  // for now we are hiding this page
+  notFound();
+
   const params = await props.params;
   const countryCode = "us";
   const handle = params.handle;
@@ -79,6 +85,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage(props: Props) {
+  // for now we are hiding this page
+  notFound();
+
   const params = await props.params;
   const countryCode = "us";
   const region = await getRegion(countryCode);

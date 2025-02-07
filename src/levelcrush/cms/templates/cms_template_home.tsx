@@ -8,6 +8,7 @@ import { H2 } from "@levelcrush/elements/headings";
 import PortableBody from "@levelcrush/portable/portable_body";
 import BlogList, { BlogPostListingRecord } from "@levelcrush/blog/blog_list";
 import Hero from "@levelcrush/hero";
+import DiscordLink from "@levelcrush/discord_link";
 
 export default function CMSTemplateHome(props: CMSTemplateProps) {
   if (!props.page.template) {
@@ -15,9 +16,6 @@ export default function CMSTemplateHome(props: CMSTemplateProps) {
   }
 
   const addl = props.additional || {};
-  const posts =
-    (addl.posts as BlogPostListingRecord[] | null | undefined) ||
-    ([] as BlogPostListingRecord[]);
 
   const metadata = props.page.template.metadata || [];
 
@@ -52,9 +50,9 @@ export default function CMSTemplateHome(props: CMSTemplateProps) {
         <div className="w-full px-4">
           <H2>{props.page.title}</H2>
           <PortableBody blocks={props.page.body} />
+          <DiscordLink />
         </div>
       </ContainerInner>
-      <BlogList post={posts} />
     </>
   );
 }

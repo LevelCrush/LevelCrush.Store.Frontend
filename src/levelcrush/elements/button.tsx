@@ -27,7 +27,7 @@ export const Button = (props: ButtonProps) => (
     {...props}
     type={props.type || "button"}
     className={twMerge(
-      'block w-full px-4 py-2 rounded transition-all duration-300 ease-in-out ' +
+      'block w-full px-4 py-2 rounded transition-all duration-300 ease-in-out disabled:opacity-80 disabled:hover:cursor-default ' +
         (() => {
           switch (props.intention) {
             case 'normal':

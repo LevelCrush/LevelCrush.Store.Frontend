@@ -29,6 +29,7 @@ export interface BlogPostSectionComponentProps {
 }
 
 export function BlogPostCover(props: BlogPostSectionComponentProps) {
+  
   return (
     <>
       {props.post.image ? (

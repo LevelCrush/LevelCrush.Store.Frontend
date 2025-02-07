@@ -14,7 +14,7 @@ import {
   updateCart,
 } from "@lib/data/cart";
 import { getAuthHeaders, getCacheTag } from "@lib/data/cookies";
-import { retrieveCustomer } from "@lib/data/customer";
+import { retrieveCustomer, updateCustomer } from "@lib/data/customer";
 import { listCartShippingMethods } from "@lib/data/fulfillment";
 import { listCartPaymentMethods } from "@lib/data/payment";
 import { listProducts } from "@lib/data/products";
@@ -29,13 +29,12 @@ import ShippingPriceNudge from "@modules/shipping/components/free-shipping-price
 import { match } from "assert";
 import { error } from "console";
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 
-
-export async function clearCart() { 
-  
+export async function clearCart() {
   const cart = await getOrSetCart("us");
   const items = cart.items || [];
-  for(const item of items) {
+  for (const item of items) {
     await deleteLineItem(item.id);
   }
 }
@@ -54,39 +53,37 @@ export async function orderHolidayGift(formData: FormData) {
   };
 
   const customer = await retrieveCustomer();
-  const metadata = customer?.metadata  || {};
-  if(!metadata["discord.id"]) {
+  const metadata = customer?.metadata || {};
+  if (!metadata["discord.id"]) {
     throw new Error("No linked discord");
   }
 
-  if(!metadata["discord.server_member"]) {
+  if (!metadata["discord.server_member"]) {
     throw new Error("Not in discord server");
-  
   }
 
-  if(!metadata["bungie.id"]) {
+  if (!metadata["bungie.id"]) {
     throw new Error("No linked bungie");
   }
 
-  if(!metadata["bungie.clan_member"])  {
+  if (!metadata["bungie.clan_member"]) {
     throw new Error("Not a clan member");
   }
-  
+
   let sku = "";
-  if(metadata["discord.admin"] === true) {
+  if (metadata["discord.admin"] === true) {
     sku = HOLIDAY_GIFTS_2024.ACTIVE_FOUNDER;
-  } else if(metadata["discord.retired"] === true) {
+  } else if (metadata["discord.retired"] === true) {
     sku = HOLIDAY_GIFTS_2024.RETIRED_FOUNDER;
-  } else if(metadata["discord.booster"] === true) {
+  } else if (metadata["discord.booster"] === true) {
     sku = HOLIDAY_GIFTS_2024.SERVER_BOOSTER;
   } else {
     sku = HOLIDAY_GIFTS_2024.NORMAL;
   }
 
-  if(!sku) {
+  if (!sku) {
     throw new Error("No Gift Sku could be found");
   }
-
 
   // get holiday gift skus
   const d2ProductRequest = await listProducts({
@@ -331,9 +328,7 @@ export async function orderHolidayGift(formData: FormData) {
   }
 
   const selectedAddress = (formData.get("selectedAddress") as string) || "";
-  console.warn("SELECTED ADDRESS: ", selectedAddress);
   if (selectedAddress.trim().length > 0 && selectedAddress !== "on") {
-    console.log("Address", selectedAddress);
     const matchedAddress = account.addresses.find(
       (v) => v.id === selectedAddress
     );
@@ -341,8 +336,6 @@ export async function orderHolidayGift(formData: FormData) {
     if (!matchedAddress) {
       throw new Error("No address could be matched");
     }
-
-    console.warn("MATCHED ADDRESS", matchedAddress);
 
     // pass through our address to our form data
 
@@ -367,8 +360,6 @@ export async function orderHolidayGift(formData: FormData) {
     formData.set("shipping_address.province", matchedAddress.province || "");
   }
 
-  console.warn("FORM DATA", formData);
-
   const shippingAddress = {
     first_name: formData.get("shipping_address.first_name") || "",
     last_name: formData.get("shipping_address.last_name") || "",
@@ -382,9 +373,6 @@ export async function orderHolidayGift(formData: FormData) {
     phone: formData.get("shipping_address.phone") || "",
   } as StoreAddAddress;
 
-  console.warn("Updating cart with SHIPPING");
-  console.warn(shippingAddress);
-
   // if there is no country code make sure there is one
   shippingAddress.country_code = shippingAddress.country_code || "us";
 
@@ -393,8 +381,6 @@ export async function orderHolidayGift(formData: FormData) {
     metadata: JSON.parse(JSON.stringify(account.metadata)),
     email: account.email,
   });
-
-  console.warn("Setting shipping", targetShipping);
 
   await setShippingMethod({
     cartId: cart.id,
@@ -406,13 +392,25 @@ export async function orderHolidayGift(formData: FormData) {
     provider_id: "pp_system_default",
   });
 
-  console.log("Placing Order for cart", cart.id);
-  await placeOrder(cart.id);
+  const result = await placeOrder(cart.id, false);
+  if (typeof result === "string") {
+    const metadata = customer?.metadata || {};
 
-  console.log("Done placing order!");
-  const err = "";
+    metadata["gift.h24"] = true;
+
+    // update metadata
+    await updateCustomer({
+      metadata,
+    });
+
+    // then redirect
+    redirect(result);
+  }
+
+  // if we made it this far without the redirect. Something is wrong
+  const err = "Unable to place order";
   return {
-    success: true,
+    success: false,
     error: err,
     response: {},
   };

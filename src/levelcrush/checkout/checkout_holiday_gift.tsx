@@ -30,6 +30,8 @@ import AddAddress from "@modules/account/components/address-card/add-address";
 import CountrySelect from "@modules/checkout/components/country-select";
 import Input from "@modules/common/components/input";
 import { useActionState, useContext, useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { twMerge } from "tailwind-merge";
 import useDeepCompareEffect, {
   useDeepCompareEffectNoCheck,
 } from "use-deep-compare-effect";
@@ -122,6 +124,116 @@ function determineGiftType(metadata: Record<string, string | unknown>) {
   };
 }
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="submit"
+      className={pending ? "animate-pulse" : ""}
+      intention={pending ? "inactive" : "normal"}
+      disabled={pending}
+    >
+      {pending ? "Claiming!" : "Claim!"}
+    </Button>
+  );
+}
+
+function AddressFieldSet(props: { customer: StoreCustomer | null }) {
+  const account = props.customer;
+  const { pending } = useFormStatus();
+  return (
+    <Fieldset className={twMerge("my-4", pending ? "animate-pulse" : "")} disabled={pending}>
+      <Legend>Enter your shipping address</Legend>
+      <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
+        <Field>
+          <Input
+            label="First Name"
+            name="shipping_address.first_name"
+            type="text"
+            defaultValue={account?.first_name || ""}
+            required={true}
+          ></Input>
+        </Field>
+        <Field>
+          <Input
+            label="Last Name"
+            name="shipping_address.last_name"
+            type="text"
+          ></Input>
+        </Field>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
+        <Field>
+          <Input
+            label="Address"
+            name="shipping_address.address_1"
+            required={true}
+            autoComplete="address-line-1"
+            data-testid="address-1-input"
+          />
+        </Field>
+        <Field>
+          <Input
+            label="Apartment, suite, etc."
+            name="shipping_address.address_2"
+            autoComplete="address-line-2"
+            data-testid="address-2-input"
+          />
+        </Field>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
+        <Field>
+          <Input
+            label="City"
+            name="shipping_address.city"
+            required={true}
+            autoComplete="address-city"
+            data-testid="address-city-input"
+          />
+        </Field>
+        <Field>
+          <Input
+            label="Postal Code"
+            name="shipping_address.postal_code"
+            autoComplete="address-postal"
+            data-testid="address-postal"
+            required={true}
+          />
+        </Field>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
+        <Field>
+          <Input
+            label="Province / State"
+            name="shipping_address.province"
+            autoComplete="address-level1"
+            data-testid="state-input"
+            required={true}
+          />
+        </Field>
+        <Field>
+          <Select name="shipping_address.country_code" defaultValue="us">
+            <Select.Trigger className="h-[100%]" disabled={pending}>
+              <Select.Value placeholder="Country" />
+            </Select.Trigger>
+            <Select.Content>
+              {Object.keys(COUNTRY_CODES).map((code, idx) => (
+                <Select.Item
+                  key={`country_code_claim_form_${code}`}
+                  value={code.toLowerCase()}
+                >
+                  {COUNTRY_CODES[code]}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
+        </Field>
+      </div>
+    </Fieldset>
+  );
+}
+
 export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
   const { account } = useContext(AccountProviderContext);
 
@@ -168,7 +280,6 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
 
   return (
     <>
-      {" "}
       {props.page.hero ? (
         <Hero backgroundUrl={props.page.hero}>
           <H2 className="text-yellow-400 text-6xl shadow">
@@ -183,10 +294,11 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
         <PortableBody blocks={props.page.body} />
         <div className="my-8">
           <p className="my-4">
-            Based off your account information. You're getting the following:{" "}
+            Based off your account information. You're getting the following pack:
           </p>
           <H3>{targetGift.title} Gift Pack</H3>
-          <p>SKU: {targetGift.sku}</p>
+          <p><span className="font-bold">SKU:</span> {targetGift.sku}</p>
+          <p className="my-4">Which gives you the following</p>
           <ul className="list-decimal list-inside my-4">
             {targetGift.includes.map((item, idx) => (
               <li key={`holiday_gift_includes_${idx}`}>{item}</li>
@@ -223,98 +335,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
             leaveTo="transform scale-95 opacity-0 max-h-0"
           >
             <div>
-              <Fieldset className="my-4">
-                <Legend>Enter your shipping address</Legend>
-                <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
-                  <Field>
-                    <Input
-                      label="First Name"
-                      name="shipping_address.first_name"
-                      type="text"
-                      defaultValue={account?.first_name || ""}
-                      required={true}
-                    ></Input>
-                  </Field>
-                  <Field>
-                    <Input
-                      label="Last Name"
-                      name="shipping_address.last_name"
-                      type="text"
-                    ></Input>
-                  </Field>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
-                  <Field>
-                    <Input
-                      label="Address"
-                      name="shipping_address.address_1"
-                      required={true}
-                      autoComplete="address-line-1"
-                      data-testid="address-1-input"
-                    />
-                  </Field>
-                  <Field>
-                    <Input
-                      label="Apartment, suite, etc."
-                      name="shipping_address.address_2"
-                      autoComplete="address-line-2"
-                      data-testid="address-2-input"
-                    />
-                  </Field>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
-                  <Field>
-                    <Input
-                      label="City"
-                      name="shipping_address.city"
-                      required={true}
-                      autoComplete="address-city"
-                      data-testid="address-city-input"
-                    />
-                  </Field>
-                  <Field>
-                    <Input
-                      label="Postal Code"
-                      name="shipping_address.postal_code"
-                      autoComplete="address-postal"
-                      data-testid="address-postal"
-                      required={true}
-                    />
-                  </Field>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
-                  <Field>
-                    <Input
-                      label="Province / State"
-                      name="shipping_address.province"
-                      autoComplete="address-level1"
-                      data-testid="state-input"
-                 
-                      required={true}
-                    />
-                  </Field>
-                  <Field>
-                    <Select
-                      name="shipping_address.country_code"
-                      defaultValue="us"
-                    >
-                      <Select.Trigger className="h-[100%]">
-                        <Select.Value placeholder="Country" />
-                      </Select.Trigger>
-                      <Select.Content>
-                        {Object.keys(COUNTRY_CODES).map((code, idx) => (
-                          <Select.Item
-                            key={`country_code_claim_form_${code}`}
-                            value={code.toLowerCase()}
-                          >
-                            {COUNTRY_CODES[code]}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select>
-                  </Field>
-                </div>
-              </Fieldset>
+              <AddressFieldSet customer={account} />
               <div className="">
                 {formState.error && (
                   <div
@@ -328,9 +349,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
             </div>
           </Transition>
           <div className="w-auto md:max-w-[10rem] lg:max-w-[10rem]">
-            <Button type="submit" intention={"normal"}>
-              Claim!
-            </Button>
+            <SubmitButton />
           </div>
         </form>
       </ContainerInner>

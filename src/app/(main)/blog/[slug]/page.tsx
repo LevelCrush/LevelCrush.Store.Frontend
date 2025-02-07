@@ -9,6 +9,7 @@ type Props = {
 };
 
 export default async function BlogPage(props: Props) {
+  notFound();
   const params = await props.params;
   const slug = params.slug || "";
 

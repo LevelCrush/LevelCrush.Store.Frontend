@@ -10,6 +10,8 @@ import CheckoutHolidayGift from "@levelcrush/checkout/checkout_holiday_gift";
 import { getRegion } from "@lib/data/regions";
 import { notFound } from "next/navigation";
 import cms from "@levelcrush/cms";
+import ContainerInner from "@levelcrush/elements/container_inner";
+import Button, { HyperlinkButton } from "@levelcrush/elements/button";
 
 export const metadata: Metadata = {
   title: "Holiday Gift 2024 | Level Crush",
@@ -101,6 +103,19 @@ export default async function HolidayGiftPage() {
     (metadata["bungie.id"] as string).trim().length === 0
   ) {
     return LinkBungie();
+  }
+
+  if (metadata["gift.h24"] === true) {
+    return (
+      <ContainerInner>
+        <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center mx-auto">
+          <H2 className="w-full text-center">Already claimed.</H2>
+          <HyperlinkButton className="mt-8 mb-4" href="/" intention={"normal"}>
+            Go Home
+          </HyperlinkButton>
+        </div>
+      </ContainerInner>
+    );
   }
 
   const page = await cms.page("/holiday-gift");

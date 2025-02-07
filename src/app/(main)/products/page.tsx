@@ -19,15 +19,18 @@ export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) { */
 export default async function Products() {
+  // for now we are hiding this page
+  notFound();
+
   const region = await getRegion("us");
 
-  if(!region) { 
+  if (!region) {
     notFound();
   }
 
   const collection = await getCollectionByHandle("members-only");
 
-  if(!collection) {
+  if (!collection) {
     notFound();
   }
 

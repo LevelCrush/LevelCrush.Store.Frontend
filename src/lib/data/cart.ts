@@ -380,7 +380,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
  * @param cartId - optional - The ID of the cart to place an order for.
  * @returns The cart object if the order was successful, or null if not.
  */
-export async function placeOrder(cartId?: string) {
+export async function placeOrder(cartId?: string, doRedirect = true) {
   const id = cartId || (await getCartId());
 
   if (!id) {
@@ -404,8 +404,13 @@ export async function placeOrder(cartId?: string) {
     const countryCode =
       cartRes.order.shipping_address?.country_code?.toLowerCase();
     removeCartId();
-   // redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`);
-    redirect(`/order/${cartRes?.order.id}/confirmed`);
+    // redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`);
+    const redirectUrl = `/order/${cartRes?.order.id}/confirmed`;
+    if (doRedirect) {
+      redirect(redirectUrl);
+    } else {
+        return redirectUrl;
+    }
   }
 
   return cartRes.cart;

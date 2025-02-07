@@ -62,7 +62,9 @@ export default function CMSTemplateEmbed(props: CMSTemplateProps) {
    */
 
   console.log(groups);
-
+  
+  // access live chat youtube: https://www.youtube.com/live_chat?v=videoidhere&embed_domain=[domainhere]
+  // twitch live chat https://www.twitch.tv/embed/<channel>/chat?parent=<parent>
   return (
     <>
       <ContainerInner>
