@@ -14,6 +14,8 @@ import { notFound } from "next/navigation";
 import cms from "@levelcrush/cms";
 import ContainerInner from "@levelcrush/elements/container_inner";
 import Button, { HyperlinkButton } from "@levelcrush/elements/button";
+import { revalidateTag } from "next/cache";
+import { getCacheTag } from "@lib/data/cookies";
 
 export const metadata: Metadata = {
   title: "Holiday Gift 2024 | Level Crush",
@@ -89,7 +91,7 @@ function LinkBungie() {
 }
 
 export default async function HolidayGiftPage() {
-  const account = await retrieveCustomer();
+  const account = await retrieveCustomer("no-store");
   const region = await getRegion("us");
 
   if (!region) {

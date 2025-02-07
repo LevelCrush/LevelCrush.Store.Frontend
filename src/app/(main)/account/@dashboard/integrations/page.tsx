@@ -6,6 +6,8 @@ import AddressBook from "@modules/account/components/address-book";
 import { getRegion } from "@lib/data/regions";
 import { retrieveCustomer } from "@lib/data/customer";
 import AccountLinkBook from "@levelcrush/profile/integrations/accountLinkBook";
+import { getCacheTag } from "@lib/data/cookies";
+import { revalidateTag } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Integrations",
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Integrations() {
-  const customer = await retrieveCustomer();
+  const customer = await retrieveCustomer("no-store");
 
   if (!customer) {
     notFound();
