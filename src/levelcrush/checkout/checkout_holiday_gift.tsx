@@ -251,7 +251,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
     error: null,
     response: {},
   });
-  const [successState, setSuccessState] = useState(false);
+  
   const [targetGift, setTargetGift] = useState(
     determineGiftType(customer?.metadata || {})
   );
@@ -271,19 +271,6 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
     setCustomer(customer);
     setTargetGift(determineGiftType(account?.metadata || {}));
   }, [account]);
-
-  useEffect(() => {
-    if (successState) {
-      console.log("Success!");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [successState]);
-
-  useEffect(() => {
-    if (formState?.success) {
-      setSuccessState(true);
-    }
-  }, [formState]);
 
   const metadata = account?.metadata || {};
   if (metadata["gift.h24"] === true) {

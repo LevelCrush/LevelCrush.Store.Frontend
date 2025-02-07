@@ -107,7 +107,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       metadata: newMetadata,
     });
 
-    setTimeout(() => (window.location.reload(true)), 250);
+    setTimeout(() => (window.location.reload()), 250);
     return;
 
     await accountFetch();
@@ -144,7 +144,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
                 metadata: newMetadata,
               });
 
-              setTimeout(() => (window.location.reload(true)), 250);
+              setTimeout(() => (window.location.reload()), 250);
               return;
             }
           }

@@ -93,6 +93,7 @@ export default async function HolidayGiftPage() {
   const region = await getRegion("us");
 
   if (!region) {
+    console.warn("No region for holiday gift");
     notFound();
   }
 
@@ -138,6 +139,7 @@ export default async function HolidayGiftPage() {
 
   const page = await cms.page("/holiday-gift");
   if (!page) {
+    console.warn("No CMS Page found");
     notFound();
   }
 

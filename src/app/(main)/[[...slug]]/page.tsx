@@ -51,6 +51,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function FallbackPage(props: Props) {
+
+  console.warn("Looking for slug");
   const params = await props.params;
   const slugs = params.slug || [];
   const route = `/${slugs.join("/")}`;
