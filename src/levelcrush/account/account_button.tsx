@@ -57,7 +57,7 @@ export default function AccountButton() {
       }
 
       if (!json.token) {
-        alert("Authenticatin failed");
+        alert("Authentication failed");
         return;
       }
     } catch (err) {

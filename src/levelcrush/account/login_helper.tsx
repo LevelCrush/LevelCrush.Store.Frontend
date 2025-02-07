@@ -24,6 +24,7 @@ interface DiscordValidationResult {
   globalName: string;
   isBooster: boolean;
   isRetired: boolean;
+  userRedirect: string
 }
 
 export default function LoginHelper() {
@@ -113,8 +114,6 @@ export default function LoginHelper() {
         credentials: "include",
       });
 
-
-    
       var sessReq = await fetch(
         `${
           process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"] || ""
@@ -127,18 +126,16 @@ export default function LoginHelper() {
 
       const data = await res.json();
       const token = data.token;
-      const decoded = decodeToken(token)
-      console.log(decoded);
       const sessionJson = (await sessReq.json()) as DiscordValidationResult;
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
 
       if (shouldCreateCustomer) {
-        console.log("Sending", sessionJson.email);
-
         await createCustomer(token, sessionJson.email, sessionJson);
         await refreshToken(token);
       }
+
+      const userRedirect = sessionJson.userRedirect || "";
 
       //const form = new FormData();
       //form.append("token", token);
@@ -163,7 +160,6 @@ export default function LoginHelper() {
         "discord.booster": sessionJson.isBooster,
         "discord.retired": sessionJson.isRetired,
         "discord.email": sessionJson.email,
-        
       };
 
       await updateCustomer({
@@ -175,8 +171,11 @@ export default function LoginHelper() {
         metadata: metadata,
       });
 
-      router.push("/");
-
+      if (userRedirect) {
+        router.push(userRedirect);
+      } else {
+        router.push("/");
+      }
       //window.location.href = "/";
     } catch (err) {
       console.log("REQ ERROR", err);

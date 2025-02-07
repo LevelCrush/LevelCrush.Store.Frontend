@@ -17,7 +17,7 @@ type Props = {
 
 export async function generateStaticParams() {
   // for now we are hiding this page
-  notFound();
+  //notFound();
 
   const product_categories = await listCategories();
 

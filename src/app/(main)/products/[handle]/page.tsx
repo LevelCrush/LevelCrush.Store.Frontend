@@ -16,8 +16,6 @@ type Props = {
 
 export async function generateStaticParams() {
   // for now we are hiding this page
-  notFound();
-
   try {
     const countryCodes = await listRegions().then((regions) =>
       regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()

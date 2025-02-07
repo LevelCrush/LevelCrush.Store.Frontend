@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { page } from "@levelcrush/cms";
 import { CMSPageRecord } from "@levelcrush/cms/cms_page";
-import Button from "@levelcrush/elements/button";
+import Button, { HyperlinkButton } from "@levelcrush/elements/button";
 import ContainerInner from "@levelcrush/elements/container_inner";
 import { H2, H3 } from "@levelcrush/elements/headings";
 import Hero from "@levelcrush/hero";
@@ -29,6 +29,7 @@ import { Label, Select } from "@medusajs/ui";
 import AddAddress from "@modules/account/components/address-card/add-address";
 import CountrySelect from "@modules/checkout/components/country-select";
 import Input from "@modules/common/components/input";
+import { title } from "process";
 import { useActionState, useContext, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { twMerge } from "tailwind-merge";
@@ -36,10 +37,13 @@ import useDeepCompareEffect, {
   useDeepCompareEffectNoCheck,
 } from "use-deep-compare-effect";
 
+export type RasputinTitlesResponse = { title: string; amount: number }[];
+
 export interface CheckoutHolidayGiftProps {
   customer: StoreCustomer;
   region: StoreRegion;
   page: CMSPageRecord;
+  titles: RasputinTitlesResponse;
 }
 
 function CustomerAddress(props: {
@@ -143,8 +147,11 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
   const account = props.customer;
   const { pending } = useFormStatus();
   return (
-    <Fieldset className={twMerge("my-4", pending ? "animate-pulse" : "")} disabled={pending}>
-      <Legend>Enter your shipping address</Legend>
+    <Fieldset
+      className={twMerge("my-4", pending ? "animate-pulse" : "")}
+      disabled={pending}
+    >
+      <Legend>Enter your shipping address. </Legend>
       <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
         <Field>
           <Input
@@ -278,6 +285,21 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
     }
   }, [formState]);
 
+  const metadata = account?.metadata || {};
+  if (metadata["gift.h24"] === true) {
+    // this is the same as the page level. Should probably move these into one function at some point
+    return (
+      <ContainerInner>
+        <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center mx-auto">
+          <H2 className="w-full text-center">Already claimed.</H2>
+          <HyperlinkButton className="mt-8 mb-4" href="/" intention={"normal"}>
+            Go Home
+          </HyperlinkButton>
+        </div>
+      </ContainerInner>
+    );
+  }
+
   return (
     <>
       {props.page.hero ? (
@@ -294,16 +316,32 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
         <PortableBody blocks={props.page.body} />
         <div className="my-8">
           <p className="my-4">
-            Based off your account information. You're getting the following pack:
+            Based off your account information. You're getting the following
+            pack:
           </p>
-          <H3>{targetGift.title} Gift Pack</H3>
-          <p><span className="font-bold">SKU:</span> {targetGift.sku}</p>
-          <p className="my-4">Which gives you the following</p>
+          <H3 className="text-yellow-400">{targetGift.title} Gift Pack</H3>
+          <p className="mb-8 text-white opacity-20">
+            <span className="font-bold">SKU:</span> {targetGift.sku}
+          </p>
+          <p className="my-4 ">Which gives you the following</p>
           <ul className="list-decimal list-inside my-4">
             {targetGift.includes.map((item, idx) => (
               <li key={`holiday_gift_includes_${idx}`}>{item}</li>
             ))}
           </ul>
+          <div className="my-8 py-8 px-4 border-[rgba(255,255,255,.1)] border-[2px] border-dashed">
+            <H3 className="text-center mb-8">Titles Earned</H3>
+            <ul className="grid grid-cols-[repeat(auto-fill,15rem)] px-4 lg:px-0 gap-4 justify-center mb-4">
+              {props.titles.map((record, rdx) => (
+                <li
+                  className="p-4 border-white border-solid border-[1px] min-w-[15rem] text-center"
+                  key={`title_earned_${rdx}`}
+                >
+                  {record.title}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <form className="my-8" action={formAction}>
           <Fieldset>

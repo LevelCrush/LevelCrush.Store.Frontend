@@ -6,7 +6,9 @@ import Container from "@levelcrush/elements/container";
 import AccountButton from "@levelcrush/account/account_button";
 import AccountLinkPlatform from "@levelcrush/profile/integrations/accountLinkPlatform";
 import Link from "next/link";
-import CheckoutHolidayGift from "@levelcrush/checkout/checkout_holiday_gift";
+import CheckoutHolidayGift, {
+  RasputinTitlesResponse,
+} from "@levelcrush/checkout/checkout_holiday_gift";
 import { getRegion } from "@lib/data/regions";
 import { notFound } from "next/navigation";
 import cms from "@levelcrush/cms";
@@ -20,16 +22,22 @@ export const metadata: Metadata = {
 
 function LinkDiscord() {
   return (
-    <Container>
-      <H1>Discord Account</H1>
-      <AccountButton />
-    </Container>
+    <ContainerInner>
+      <H2 className="text-center">Please Login with Discord</H2>
+      <p className="my-4 text-center">
+        This gift is personal, private and intended only for Level Crush or
+        Level Stomp clan members
+      </p>
+      <div className="w-full md:max-w-[30rem] mx-auto">
+        <AccountButton />
+      </div>
+    </ContainerInner>
   );
 }
 
 function LinkBungie() {
   return (
-    <Container>
+    <ContainerInner>
       <H2 className="mb-4">Bungie Membership</H2>
       <p className="mb-4">
         You will only be able to proceed on with the following conditions
@@ -39,6 +47,7 @@ function LinkBungie() {
         <li>
           You are in either the{" "}
           <Link
+            className="underline"
             target="_blank"
             href="https://www.bungie.net/en/ClanV2?groupid=4356849"
           >
@@ -47,6 +56,7 @@ function LinkBungie() {
           Destiny clan OR the{" "}
           <Link
             target="_blank"
+            className="underline"
             href="https://www.bungie.net/en/ClanV2?groupid=4250497"
           >
             Level Stomp
@@ -74,7 +84,7 @@ function LinkBungie() {
           },
         ]}
       />
-    </Container>
+    </ContainerInner>
   );
 }
 
@@ -93,15 +103,23 @@ export default async function HolidayGiftPage() {
   const metadata = account.metadata || {};
   if (
     !metadata["discord.id"] ||
-    (metadata["discord.id"] as string).trim().length === 0
+    (`${metadata["discord.id"]}` as string).trim().length === 0
   ) {
+    return LinkDiscord();
+  }
+
+  if (!metadata["discord.server_member"]) {
     return LinkDiscord();
   }
 
   if (
     !metadata["bungie.id"] ||
-    (metadata["bungie.id"] as string).trim().length === 0
+    (`${metadata["bungie.id"]}` as string).trim().length === 0
   ) {
+    return LinkBungie();
+  }
+
+  if (!metadata["bungie.clan_member"]) {
     return LinkBungie();
   }
 
@@ -119,6 +137,32 @@ export default async function HolidayGiftPage() {
   }
 
   const page = await cms.page("/holiday-gift");
+  if (!page) {
+    notFound();
+  }
 
-  return <CheckoutHolidayGift region={region} customer={account} page={page} />;
+  const rasputinRes = await fetch(
+    `${process.env["NEXT_PUBLIC_RASPUTIN"]}/member/${encodeURIComponent(
+      metadata["bungie.id"] + ""
+    )}/titles`,
+    {
+      method: "GET",
+      cache: "force-cache",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const rasputinData = (await rasputinRes.json()) as RasputinTitlesResponse;
+
+  return (
+    <CheckoutHolidayGift
+      region={region}
+      customer={account}
+      page={page}
+      titles={rasputinData}
+    />
+  );
 }

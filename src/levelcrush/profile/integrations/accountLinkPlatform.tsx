@@ -57,6 +57,8 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
   );
 
+
+
   useDeepCompareEffect(() => {
     setAccountId((metadata[props.metakeyAccountID] as string) || "");
     setDisplayName(
@@ -105,6 +107,9 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       metadata: newMetadata,
     });
 
+    setTimeout(() => (window.location.reload(true)), 250);
+    return;
+
     await accountFetch();
   }
 
@@ -138,6 +143,9 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
               await updateCustomer({
                 metadata: newMetadata,
               });
+
+              setTimeout(() => (window.location.reload(true)), 250);
+              return;
             }
           }
           await accountFetch();
@@ -153,6 +161,8 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
         return `${metavalue}`.length > 0;
       case "boolean":
         return metavalue;
+      case "number":
+        return `${metavalue}`;
       default:
         console.log("Unknown meta value type", metavalue);
         return false;
