@@ -51,10 +51,6 @@ export async function orderHolidayGift(formData: FormData) {
     // make sure the cart is clear
     await clearCart();
 
-    const headers = {
-      ...(await getAuthHeaders()),
-    };
-
     const customer = await retrieveCustomer();
     const metadata = customer?.metadata || {};
     if (!metadata["discord.id"]) {
@@ -89,7 +85,7 @@ export async function orderHolidayGift(formData: FormData) {
     }
 
     // get holiday gift skus
-    const d2ProductRequest = await listProducts({
+    /*const d2ProductRequest = await listProducts({
       countryCode: "us",
       regionId: region.id,
       queryParams: { handle: "gift-seals" },
@@ -99,7 +95,21 @@ export async function orderHolidayGift(formData: FormData) {
       countryCode: "us",
       regionId: region.id,
       queryParams: { handle: "holiday-gift" },
-    });
+    }); */
+
+    console.warn("Searching for gift seals and holiday gift skus");
+    const [d2ProductRequest, giftProductRequest] = await Promise.all([
+      listProducts({
+        countryCode: "us",
+        regionId: region.id,
+        queryParams: { handle: "gift-seals" },
+      }),
+      listProducts({
+        countryCode: "us",
+        regionId: region.id,
+        queryParams: { handle: "holiday-gift" },
+      }),
+    ]);
 
     if (giftProductRequest.response.products.length === 0) {
       throw new Error("No Holiday Gift could be found");
@@ -139,6 +149,8 @@ export async function orderHolidayGift(formData: FormData) {
     // fresh cart always
     let cart = await getOrSetCart("us");
 
+    console.warn("Starting rasputin request");
+
     const rasputinRes = await fetch(
       `${process.env["NEXT_PUBLIC_RASPUTIN"]}/member/${encodeURIComponent(
         metadata["bungie.id"] + ""
@@ -152,6 +164,8 @@ export async function orderHolidayGift(formData: FormData) {
         },
       }
     );
+
+    console.warn("Done getting rasputin request");
 
     const rasputinData = (await rasputinRes.json()) as RasputinTitlesResponse;
 
@@ -178,19 +192,24 @@ export async function orderHolidayGift(formData: FormData) {
     }
 
     // add overall gift variant to cart
-    await addToCart({
-      variantId: targetVarient.id,
-      quantity: 1,
-      countryCode: "us",
-    });
+    const actions = [] as Promise<void>[];
+    actions.push(
+      addToCart({
+        variantId: targetVarient.id,
+        quantity: 1,
+        countryCode: "us",
+      })
+    );
 
     // add seals to cart
     for (const seal of targetSeals) {
-      await addToCart({
-        variantId: seal.id,
-        quantity: 1,
-        countryCode: "us",
-      });
+      actions.push(
+        addToCart({
+          variantId: seal.id,
+          quantity: 1,
+          countryCode: "us",
+        })
+      );
     }
 
     // now determine based on pack what to add to the cart as well
@@ -228,11 +247,13 @@ export async function orderHolidayGift(formData: FormData) {
         throw new Error("No keepsake variant could be found");
       }
 
-      addToCart({
-        variantId: keepsakeVariant.id,
-        quantity: 1,
-        countryCode: "us",
-      });
+      actions.push(
+        addToCart({
+          variantId: keepsakeVariant.id,
+          quantity: 1,
+          countryCode: "us",
+        })
+      );
     }
 
     if (needsCup) {
@@ -254,11 +275,13 @@ export async function orderHolidayGift(formData: FormData) {
         throw new Error("No tumbler variant found");
       }
 
-      addToCart({
-        variantId: tumblerVariant.id,
-        quantity: 1,
-        countryCode: "us",
-      });
+      actions.push(
+        addToCart({
+          variantId: tumblerVariant.id,
+          quantity: 1,
+          countryCode: "us",
+        })
+      );
     }
 
     // cards
@@ -292,31 +315,39 @@ export async function orderHolidayGift(formData: FormData) {
     }
 
     // everyone gets the standard card
-    addToCart({
-      variantId: cardStandard.id,
-      quantity: 1,
-      countryCode: "us",
-    });
-
-    if (needsRetiredFounderCard) {
+    actions.push(
       addToCart({
-        variantId: cardRetired.id,
+        variantId: cardStandard.id,
         quantity: 1,
         countryCode: "us",
-      });
+      })
+    );
+
+    if (needsRetiredFounderCard) {
+      actions.push(
+        addToCart({
+          variantId: cardRetired.id,
+          quantity: 1,
+          countryCode: "us",
+        })
+      );
     }
 
     if (needsFounderCard) {
-      addToCart({
-        variantId: cardFounder.id,
-        quantity: 1,
-        countryCode: "us",
-      });
+      actions.push(
+        addToCart({
+          variantId: cardFounder.id,
+          quantity: 1,
+          countryCode: "us",
+        })
+      );
     }
 
+    await Promise.all(actions);
+
     // shipping methods
-    const shippingMethods = await listCartShippingMethods(cart.id);
-    const paymentMethods = await listCartPaymentMethods(region.id);
+    const [shippingMethods, paymentMethods] = await Promise.all([listCartShippingMethods(cart.id), listCartPaymentMethods(region.id)]);
+    
 
     if (!shippingMethods) {
       throw new Error("No valid shipping methods");
