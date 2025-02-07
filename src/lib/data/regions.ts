@@ -42,27 +42,22 @@ const regionMap = new Map<string, HttpTypes.StoreRegion>();
 
 export const getRegion = async (countryCode: string) => {
   try {
-    console.warn("Starting to search for region");
     if (regionMap.has(countryCode)) {
       return regionMap.get(countryCode);
     }
 
-    console.warn("Listing Regions");
     const regions = await listRegions();
-    console.warn(regions);
+
     if (!regions) {
       return null;
     }
 
     regions.forEach((region) => {
       region.countries?.forEach((c) => {
-        console.warn(c.iso_2, region, region.countries);
         regionMap.set(c?.iso_2 ?? "", region);
       });
     });
 
-    console.warn("COuntry Code", countryCode);
-    console.warn("Region Map", regionMap);
     const region = countryCode
       ? regionMap.get(countryCode)
       : regionMap.get("us");
