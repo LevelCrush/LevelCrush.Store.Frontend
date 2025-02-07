@@ -6,6 +6,25 @@ checkEnvVariables()
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  headers: async () => {
+    return [{
+      source: "/holiday-gift",
+      headers: {
+        "key": "Cache-Control",
+        "value": "s-maxage=1, stale-while-revalidate=59"
+      },
+      source: "/account/integrations",
+      headers: {
+        "key": "Cache-Control",
+        "value": "s-maxage=1, stale-while-revalidate=59"
+      },
+      source: "/account/addresses",
+      headers: {
+        "key": "Cache-Control",
+        "value": "s-maxage=1, stale-while-revalidate=59"
+      }
+    }]
+  },
   reactStrictMode: true,
   logging: {
     fetches: {
