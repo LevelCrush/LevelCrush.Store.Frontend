@@ -36,7 +36,7 @@ const AddAddress = ({
   useEffect(() => {
     if (successState) {
       close();
-      setTimeout(() => window.location.reload(true), 100);
+      setTimeout(() => window.location.reload(), 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successState]);

@@ -52,7 +52,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
   useEffect(() => {
     if (formState.success) {
       setSuccessState(true);
-      setTimeout(() => window.location.reload(true), 100);
+      setTimeout(() => window.location.reload(), 100);
     }
   }, [formState]);
 
@@ -60,7 +60,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
     setRemoving(true);
     await deleteCustomerAddress(address.id);
     setRemoving(false);
-    setTimeout(() => window.location.reload(true), 100);
+    setTimeout(() => window.location.reload(), 100);
   };
 
   return (

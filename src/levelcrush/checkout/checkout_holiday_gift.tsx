@@ -256,16 +256,16 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
     determineGiftType(customer?.metadata || {})
   );
 
+  const [selectedAddress, setSelectedAddress] = useState(
+    customer.addresses.length > 0 ? customer.addresses[0].id : ""
+  );
+
   async function requestHolidayGift(
     state: Record<string, unknown>,
     formData: FormData
   ) {
     return await orderHolidayGift(formData);
   }
-
-  const [selectedAddress, setSelectedAddress] = useState(
-    customer.addresses.length > 0 ? customer.addresses[0].id : ""
-  );
 
   useDeepCompareEffectNoCheck(() => {
     setCustomer(customer);
