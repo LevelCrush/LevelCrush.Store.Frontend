@@ -33,10 +33,19 @@ const AddAddress = ({
     closeModal();
   };
 
+  function forceRedirect(redirectType: "addAddress" | "editAddress" = "addAddress") {
+    const windowUrl = new URL(window.location.href);
+    const amount = windowUrl.searchParams.has(redirectType)
+      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+      : 0;
+    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+    window.location.href = windowUrl.toString();
+  }
+
   useEffect(() => {
     if (successState) {
       close();
-      setTimeout(() => window.location.reload(), 100);
+      forceRedirect();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successState]);
@@ -44,6 +53,7 @@ const AddAddress = ({
   useEffect(() => {
     if (formState.success) {
       setSuccessState(true);
+      forceRedirect();
     }
   }, [formState]);
 

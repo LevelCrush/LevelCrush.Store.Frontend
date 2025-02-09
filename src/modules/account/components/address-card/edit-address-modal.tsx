@@ -49,10 +49,19 @@ const EditAddress: React.FC<EditAddressProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successState]);
 
+  function forceRedirect(redirectType: "deleteAddress" | "editAddress" = "editAddress") {
+    const windowUrl = new URL(window.location.href);
+    const amount = windowUrl.searchParams.has(redirectType)
+      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+      : 0;
+    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+    window.location.href = windowUrl.toString();
+  }
+
   useEffect(() => {
     if (formState.success) {
       setSuccessState(true);
-      setTimeout(() => window.location.reload(), 100);
+      forceRedirect("editAddress");
     }
   }, [formState]);
 
@@ -60,7 +69,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
     setRemoving(true);
     await deleteCustomerAddress(address.id);
     setRemoving(false);
-    setTimeout(() => window.location.reload(), 100);
+    forceRedirect("deleteAddress");
   };
 
   return (

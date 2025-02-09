@@ -57,8 +57,6 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
   );
 
-
-
   useDeepCompareEffect(() => {
     setAccountId((metadata[props.metakeyAccountID] as string) || "");
     setDisplayName(
@@ -76,9 +74,9 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
 
   async function checkPlatformSession() {
     const req = await fetch(
-      `https://auth.levelcrush.com/platform/${encodeURIComponent(
-        props.platform
-      )}/session`,
+      `${
+        process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
+      }/platform/${encodeURIComponent(props.platform)}/session`,
       {
         method: "GET",
         mode: "cors",
@@ -89,6 +87,15 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
 
     const data = await req.json();
     return data;
+  }
+
+  function forceRedirect(redirectType: "postLink" | "unlink" = "postLink") {
+    const windowUrl = new URL(window.location.href);
+    const amount = windowUrl.searchParams.has(redirectType)
+      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+      : 0;
+    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+    window.location.href = windowUrl.toString();
   }
 
   async function unlinkPlatform() {
@@ -107,7 +114,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       metadata: newMetadata,
     });
 
-    setTimeout(() => (window.location.reload()), 250);
+    forceRedirect("unlink");
     return;
 
     await accountFetch();
@@ -115,9 +122,9 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
 
   function startLogin() {
     var childWindow = window.open(
-      `https://auth.levelcrush.com/platform/${encodeURIComponent(
-        props.platform
-      )}/login`,
+      `${
+        process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
+      }/platform/${encodeURIComponent(props.platform)}/login`,
       "_blank"
     );
     if (childWindow) {
@@ -144,7 +151,8 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
                 metadata: newMetadata,
               });
 
-              setTimeout(() => (window.location.reload()), 250);
+              //setTimeout(() => (window.location.reload()), 250);
+              forceRedirect("postLink");
               return;
             }
           }
