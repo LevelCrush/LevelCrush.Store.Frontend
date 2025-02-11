@@ -147,6 +147,31 @@ export default function LoginHelper() {
 
         console.log("Attempting to refresh your token");
         await refreshToken(token);
+      } else {
+        const metadata = {
+          "discord.id": sessionJson.discordId,
+          "discord.handle": sessionJson.discordHandle,
+          "discord.globalName": sessionJson.globalName,
+          "discord.server_member": sessionJson.inServer,
+          "discord.nicknames": sessionJson.nicknames,
+          "discord.admin": sessionJson.isAdmin,
+          "discord.moderator": sessionJson.isModerator,
+          "discord.booster": sessionJson.isBooster,
+          "discord.retired": sessionJson.isRetired,
+          "discord.email": sessionJson.email,
+        };
+
+        console.log("Attempting to update your customer record");
+        await updateCustomer({
+          first_name: metadata["discord.globalName"],
+          last_name: account && account.last_name ? account.last_name : "",
+          phone: account && account.phone ? account.phone : "",
+          company_name:
+            account && account.company_name ? account.company_name : "",
+          metadata: metadata,
+        });
+
+        console.log("Done updating customer record");
       }
 
       const userRedirect = sessionJson.userRedirect || "";
@@ -154,31 +179,6 @@ export default function LoginHelper() {
       //const form = new FormData();
       //form.append("token", token);
       //form.append("validation", JSON.stringify(sessionJson));
-
-      const metadata = {
-        "discord.id": sessionJson.discordId,
-        "discord.handle": sessionJson.discordHandle,
-        "discord.globalName": sessionJson.globalName,
-        "discord.server_member": sessionJson.inServer,
-        "discord.nicknames": sessionJson.nicknames,
-        "discord.admin": sessionJson.isAdmin,
-        "discord.moderator": sessionJson.isModerator,
-        "discord.booster": sessionJson.isBooster,
-        "discord.retired": sessionJson.isRetired,
-        "discord.email": sessionJson.email,
-      };
-
-      console.log("Attempting to update your customer record");
-      await updateCustomer({
-        first_name: metadata["discord.globalName"],
-        last_name: account && account.last_name ? account.last_name : "",
-        phone: account && account.phone ? account.phone : "",
-        company_name:
-          account && account.company_name ? account.company_name : "",
-        metadata: metadata,
-      });
-
-      console.log("Done updating customer record");
 
       if (userRedirect) {
         router.push(userRedirect);
