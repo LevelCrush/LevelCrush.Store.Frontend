@@ -12,6 +12,7 @@ import { useCookies } from "next-client-cookies";
 import { updateCustomer } from "@lib/data/customer";
 import Hyperlink from "@levelcrush/elements/hyperlink";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
+import AccountButton from "./account_button";
 
 interface DiscordValidationResult {
   discordHandle: string;
@@ -31,6 +32,7 @@ export default function LoginHelper() {
   const cookies = useCookies();
   const [loading, setLoading] = useState(false);
   const { account } = useContext(AccountProviderContext);
+  const [loginError, setLoginError] = useState("");
 
   const router = useRouter();
 
@@ -97,13 +99,16 @@ export default function LoginHelper() {
     return result.token;
   }
 
-  function forceRedirect(redirectUrl: string, redirectType: "didLogin" = "didLogin") {
+  function forceRedirect(
+    redirectUrl: string,
+    redirectType: "didLogin" = "didLogin"
+  ) {
     const windowUrl = new URL(redirectUrl);
     const amount = windowUrl.searchParams.has(redirectType)
       ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
       : 0;
     windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    window.location.href = windowUrl.toString();
+    setTimeout(() => (window.location.href = windowUrl.toString()), 250);
   }
 
   async function doCallback() {
@@ -198,6 +203,8 @@ export default function LoginHelper() {
       }
       //window.location.href = "/";
     } catch (err) {
+      setLoginError(`${err}`);
+      console.log(err.digest);
       console.log("REQ ERROR", err);
     }
     setLoading(false);
@@ -215,11 +222,24 @@ export default function LoginHelper() {
         Fancy seeing you here. You'll be moved along eventually.
       </H2>
       <p className="text-center">
-        Otherwise click <Hyperlink href="/">here</Hyperlink>
+        Otherwise click{" "}
+        <Hyperlink className="underline" href="/">
+          here
+        </Hyperlink>{" "}
+        if you are here for way to long.
       </p>
+      {loginError.length > 0 ? (
+        <div>
+          <p className="text-red">{loginError}</p>
+          <p>
+            Try logging in again. If you fail to login after another try. Send
+            this to Primal.
+          </p>
+          <AccountButton />
+        </div>
+      ) : (
+        <></>
+      )}
     </Container>
   );
-}
-function nextCookies() {
-  throw new Error("Function not implemented.");
 }
