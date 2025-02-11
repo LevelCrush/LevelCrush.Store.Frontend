@@ -51,7 +51,9 @@ export async function orderHolidayGift(formData: FormData) {
     // make sure the cart is clear
     await clearCart();
 
-    const customer = await retrieveCustomer();
+    const customer = await retrieveCustomer("no-store");
+    console.log("Customer loaded in", customer);
+    
     const metadata = customer?.metadata || {};
     if (!metadata["discord.id"]) {
       throw new Error("No linked discord");
@@ -368,7 +370,7 @@ export async function orderHolidayGift(formData: FormData) {
       throw new Error("Manual Shipping fulfillment could not be found");
     }
 
-    const account = await retrieveCustomer();
+    const account = await retrieveCustomer("no-store");
     if (!account) {
       throw new Error("Customer account could not be found");
     }
