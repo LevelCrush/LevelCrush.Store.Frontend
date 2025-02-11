@@ -97,6 +97,15 @@ export default function LoginHelper() {
     return result.token;
   }
 
+  function forceRedirect(redirectUrl: string, redirectType: "didLogin" = "didLogin") {
+    const windowUrl = new URL(redirectUrl);
+    const amount = windowUrl.searchParams.has(redirectType)
+      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+      : 0;
+    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+    window.location.href = windowUrl.toString();
+  }
+
   async function doCallback() {
     setLoading(true);
 
@@ -181,9 +190,11 @@ export default function LoginHelper() {
       //form.append("validation", JSON.stringify(sessionJson));
 
       if (userRedirect) {
-        router.push(userRedirect);
+        //router.push(userRedirect);
+        forceRedirect(userRedirect);
       } else {
-        router.push("/");
+        //router.push("/");
+        forceRedirect("/");
       }
       //window.location.href = "/";
     } catch (err) {
