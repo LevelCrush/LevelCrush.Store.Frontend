@@ -130,6 +130,8 @@ export default function LoginHelper() {
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
 
+      console.log("Are you a new customer?", shouldCreateCustomer);
+
       // set token before other calls
       cookies.set("_medusa_jwt", token, {
         expires: 60 * 60 * 24 * 7,
@@ -140,7 +142,10 @@ export default function LoginHelper() {
       window.localStorage.setItem("medusa_jwt", token);
 
       if (shouldCreateCustomer) {
+        console.log("Attempting to create your customer record");
         await createCustomer(token, sessionJson.email, sessionJson);
+
+        console.log("Attempting to refresh your token");
         await refreshToken(token);
       }
 
@@ -163,6 +168,7 @@ export default function LoginHelper() {
         "discord.email": sessionJson.email,
       };
 
+      console.log("Attempting to update your customer record");
       await updateCustomer({
         first_name: metadata["discord.globalName"],
         last_name: account && account.last_name ? account.last_name : "",
@@ -171,6 +177,8 @@ export default function LoginHelper() {
           account && account.company_name ? account.company_name : "",
         metadata: metadata,
       });
+
+      console.log("Done updating customer record");
 
       if (userRedirect) {
         router.push(userRedirect);
