@@ -24,7 +24,7 @@ interface DiscordValidationResult {
   globalName: string;
   isBooster: boolean;
   isRetired: boolean;
-  userRedirect: string
+  userRedirect: string;
 }
 
 export default function LoginHelper() {
@@ -130,6 +130,15 @@ export default function LoginHelper() {
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
 
+      // set token before other calls
+      cookies.set("_medusa_jwt", token, {
+        expires: 60 * 60 * 24 * 7,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      window.localStorage.setItem("medusa_jwt", token);
+
       if (shouldCreateCustomer) {
         await createCustomer(token, sessionJson.email, sessionJson);
         await refreshToken(token);
@@ -140,14 +149,6 @@ export default function LoginHelper() {
       //const form = new FormData();
       //form.append("token", token);
       //form.append("validation", JSON.stringify(sessionJson));
-
-      cookies.set("_medusa_jwt", token, {
-        expires: 60 * 60 * 24 * 7,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-      });
-
-      window.localStorage.setItem("medusa_jwt", token);
 
       const metadata = {
         "discord.id": sessionJson.discordId,
