@@ -1,4 +1,6 @@
+import { signout } from "@lib/data/customer";
 import { HttpTypes } from "@medusajs/types";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.MEDUSA_BACKEND_URL;

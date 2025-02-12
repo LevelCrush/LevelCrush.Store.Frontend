@@ -32,7 +32,8 @@ export const retrieveOrder = async (id: string) => {
 export const listOrders = async (
   limit: number = 10,
   offset: number = 0,
-  filters?: Record<string, any>
+  filters?: Record<string, any>,
+  cache: "force-cache" | "no-store" = "force-cache"
 ) => {
   const headers = {
     ...(await getAuthHeaders()),
@@ -54,7 +55,7 @@ export const listOrders = async (
       },
       headers,
       next,
-      cache: "force-cache",
+      cache: cache,
     })
     .then(({ orders }) => orders)
     .catch((err) => medusaError(err))

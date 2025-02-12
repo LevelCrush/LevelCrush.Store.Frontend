@@ -53,6 +53,17 @@
 }
 
 @layer components {
+  .player-wrapper {
+    position: relative;
+    padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  }
+  
+  .react-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
   .content-container {
     @apply max-w-[1440px] w-full mx-auto px-6;
   }
@@ -116,6 +127,8 @@
   .text-shadow { 
     text-shadow: 1rem 1rem 1rem;
   }
+  
+
 }
 
 
@@ -157,16 +170,20 @@
     @apply bg-slate-900;
     @apply transition-all;
     @apply duration-300;
+
+    
     background-image: linear-gradient(
         to top,
         rgba(14, 28, 28, 0.85),
         rgba(14, 14, 28, 0.85)
       ),
-      url('/hero.jpg');
+      #002134;
+      /*url('/hero.jpg');  
+    background-color: #002134; */
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    background-attachment: fixed;
+    background-position: center top;
+    background-size: contain;
+    background-attachment: scroll;
   }
 
   .block-list-item .block-list-item-image {
@@ -453,7 +470,7 @@
     transform: translate(0.25rem, 0.25rem);
     transition: transform 250ms ease;
     border-radius: 1rem;
-    @apply bg-white;
+    @apply bg-transparent;
   }
 
   .toggle input:checked + .slider {
@@ -479,5 +496,15 @@
     outline-style: solid;
     box-shadow: none;
     border: none;
+  }
+
+  .drop-shadow-custom {
+    -webkit-filter: drop-shadow(0px 1px black);
+    filter: drop-shadow(0px 1px black); 
+  }
+  .drop-shadow-none { 
+    -webkit-filter: none;
+    filter: none;
+  
   }
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { listProducts } from "@lib/data/products";
 import { getRegion, listRegions } from "@lib/data/regions";
 import ProductTemplate from "@modules/products/templates";
+import { client } from "@sanity-cms/lib/client";
 
 /*
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export async function generateStaticParams() {
+  // for now we are hiding this page
   try {
     const countryCodes = await listRegions().then((regions) =>
       regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
@@ -48,6 +50,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
+  // for now we are hiding this page
+  notFound();
+
   const params = await props.params;
   const countryCode = "us";
   const handle = params.handle;
@@ -67,10 +72,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | Medusa Store`,
+    title: `${product.title} | Level Crush`,
     description: `${product.title}`,
     openGraph: {
-      title: `${product.title} | Medusa Store`,
+      title: `${product.title} | Level Crush`,
       description: `${product.title}`,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -78,6 +83,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage(props: Props) {
+  // for now we are hiding this page
+  notFound();
+
   const params = await props.params;
   const countryCode = "us";
   const region = await getRegion(countryCode);
@@ -95,11 +103,17 @@ export default async function ProductPage(props: Props) {
     notFound();
   }
 
+  // alternatively, you can filter the content by the language
+  const sanity = (await client.getDocument(pricedProduct.id))?.specs[0];
+
+  console.log("Intended Sanity", sanity);
+
   return (
     <ProductTemplate
       product={pricedProduct}
       region={region}
       countryCode={countryCode}
+      sanity={sanity}
     />
   );
 }

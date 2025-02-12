@@ -1,11 +1,42 @@
-const checkEnvVariables = require("./check-env-variables")
+const checkEnvVariables = require("./check-env-variables");
 
-checkEnvVariables()
+checkEnvVariables();
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  headers: async () => {
+    return [
+      {
+        source: "/holiday-gift",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "s-maxage=1, stale-while-revalidate=59",
+          },
+        ],
+      },
+      {
+        source: "/account/integrations",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "s-maxage=1, stale-while-revalidate=59",
+          },
+        ],
+      },
+      {
+        source: "/account/addresses",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "s-maxage=1, stale-while-revalidate=59",
+          },
+        ],
+      },
+    ];
+  },
   reactStrictMode: true,
   logging: {
     fetches: {
@@ -22,15 +53,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "levelcrush.com.s3.us-east-1.amazonaws.com"
+        hostname: "cdn.sanity.io",
       },
       {
         protocol: "https",
-        hostname: "s3.us-east-1.amazonaws.com"
+        hostname: "levelcrush.com.s3.us-east-1.amazonaws.com",
       },
       {
         protocol: "https",
-        hostname: "assets.levelcrush.com"
+        hostname: "s3.us-east-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.levelcrush.com",
       },
       {
         protocol: "http",
@@ -50,6 +85,6 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

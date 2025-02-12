@@ -1,12 +1,13 @@
-import { Metadata } from "next"
+import { Metadata } from "next";
 
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import StoreTemplate from "@modules/store/templates"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
+import StoreTemplate from "@modules/store/templates";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Store | Level Crush",
   description: "Explore all of our products.",
-}
+};
 
 /*
 type Params = {
@@ -21,23 +22,27 @@ type Params = {
 
 type Params = {
   searchParams: Promise<{
-    sortBy?: SortOptions
-    page?: string
-  }>
-}
+    sortBy?: SortOptions;
+    page?: string;
+  }>;
+};
 
 //export default async function StorePage(props: Params) {
-  export default async function StorePage(props: Params) {
+export default async function StorePage(props: Params) {
+ 
+  // for now we are hiding this page
+  notFound();
+
   //const params = await props.params;
   const searchParams = await props.searchParams;
-  const { sortBy, page } = searchParams
+  const { sortBy, page } = searchParams;
 
   return (
     <StoreTemplate
       sortBy={sortBy}
       page={page}
       countryCode="us"
-    //  countryCode={params.countryCode}
+      //  countryCode={params.countryCode}
     />
-  )
+  );
 }
