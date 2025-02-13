@@ -15,6 +15,8 @@ import {
   deleteCustomerAddress,
   updateCustomerAddress,
 } from "@lib/data/customer";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type EditAddressProps = {
   region: HttpTypes.StoreRegion;
@@ -30,6 +32,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
   const [removing, setRemoving] = useState(false);
   const [successState, setSuccessState] = useState(false);
   const { state, open, close: closeModal } = useToggleState(false);
+  const router = useRouter();
 
   const [formState, formAction] = useActionState(updateCustomerAddress, {
     success: false,
@@ -49,19 +52,26 @@ const EditAddress: React.FC<EditAddressProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successState]);
 
-  function forceRedirect(redirectType: "deleteAddress" | "editAddress" = "editAddress") {
+  function forceRedirect(
+    router: AppRouterInstance,
+    redirectType: "deleteAddress" | "editAddress" = "editAddress"
+  ) {
     const windowUrl = new URL(window.location.href);
     const amount = windowUrl.searchParams.has(redirectType)
       ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
       : 0;
     windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    window.location.href = windowUrl.toString();
+    if (router) {
+      router.push(windowUrl.toString());
+    } else {
+      window.location.href = windowUrl.toString();
+    }
   }
 
   useEffect(() => {
     if (formState.success) {
       setSuccessState(true);
-      forceRedirect("editAddress");
+      forceRedirect(router, "editAddress");
     }
   }, [formState]);
 
@@ -69,7 +79,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
     setRemoving(true);
     await deleteCustomerAddress(address.id);
     setRemoving(false);
-    forceRedirect("deleteAddress");
+    forceRedirect(router, "deleteAddress");
   };
 
   return (

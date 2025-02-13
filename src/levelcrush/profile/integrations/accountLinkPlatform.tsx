@@ -8,6 +8,8 @@ import { Suspense, useContext, useState } from "react";
 import { updateCustomer } from "@lib/data/customer";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import useDeepCompareEffect from "use-deep-compare-effect";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useRouter } from "next/navigation";
 
 interface BungieValidationResult {
   membershipId: string;
@@ -57,6 +59,8 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
   );
 
+  const router = useRouter();
+
   useDeepCompareEffect(() => {
     setAccountId((metadata[props.metakeyAccountID] as string) || "");
     setDisplayName(
@@ -89,13 +93,20 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     return data;
   }
 
-  function forceRedirect(redirectType: "postLink" | "unlink" = "postLink") {
+  function forceRedirect(
+    router: AppRouterInstance | undefined,
+    redirectType: "postLink" | "unlink" = "postLink"
+  ) {
     const windowUrl = new URL(window.location.href);
     const amount = windowUrl.searchParams.has(redirectType)
       ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
       : 0;
     windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    window.location.href = windowUrl.toString();
+    if (router) {
+      router.push(windowUrl.toString());
+    } else {
+      window.location.href = windowUrl.toString();
+    }
   }
 
   async function unlinkPlatform() {
@@ -114,7 +125,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       metadata: newMetadata,
     });
 
-    forceRedirect("unlink");
+    forceRedirect(router, "unlink");
     return;
 
     await accountFetch();
@@ -152,7 +163,7 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
               });
 
               //setTimeout(() => (window.location.reload()), 250);
-              forceRedirect("postLink");
+              forceRedirect(router, "postLink");
               return;
             }
           }

@@ -11,6 +11,8 @@ import Modal from "@modules/common/components/modal";
 import { SubmitButton } from "@modules/checkout/components/submit-button";
 import { HttpTypes } from "@medusajs/types";
 import { addCustomerAddress } from "@lib/data/customer";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const AddAddress = ({
   region,
@@ -28,24 +30,33 @@ const AddAddress = ({
     error: null,
   });
 
+  const router = useRouter();
+
   const close = () => {
     setSuccessState(false);
     closeModal();
   };
 
-  function forceRedirect(redirectType: "addAddress" | "editAddress" = "addAddress") {
+  function forceRedirect(
+    router: AppRouterInstance,
+    redirectType: "addAddress" | "editAddress" = "addAddress"
+  ) {
     const windowUrl = new URL(window.location.href);
     const amount = windowUrl.searchParams.has(redirectType)
       ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
       : 0;
     windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    window.location.href = windowUrl.toString();
+    if (router) {
+      router.push(windowUrl.toString());
+    } else {
+      window.location.href = windowUrl.toString();
+    }
   }
 
   useEffect(() => {
     if (successState) {
       close();
-      forceRedirect();
+      forceRedirect(router);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [successState]);
@@ -53,7 +64,7 @@ const AddAddress = ({
   useEffect(() => {
     if (formState.success) {
       setSuccessState(true);
-      forceRedirect();
+      forceRedirect(router);
     }
   }, [formState]);
 
