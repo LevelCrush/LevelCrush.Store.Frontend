@@ -33,8 +33,9 @@ const customComponents = {
     h5: ({ children }) => <H5>{children}</H5>,
     h6: ({ children }) => <H6>{children}</H6>,
     normal: ({children}) => {  
-      const {account} = useContext(AccountProviderContext);
       
+      const {account} = useContext(AccountProviderContext);
+
       // replace variables
       if(children instanceof Array) { 
         for(let i = 0; i < children.length;i++) { 

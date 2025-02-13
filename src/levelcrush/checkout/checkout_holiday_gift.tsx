@@ -298,7 +298,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
       ) : (
         <></>
       )}
-      <ContainerInner>
+      <ContainerInner className="mt-0">
         <H2>Claim Your Holiday Gift</H2>
         <PortableBody blocks={props.page.body} />
         <div className="my-8">
