@@ -168,7 +168,6 @@ export default function LoginHelper() {
         await createCustomer(token, sessionJson.email, metadata);
 
         console.log("Attempting to refresh your token");
-        console.log("Starting with", token);
         token = await refreshToken(token);
 
         // update token again
