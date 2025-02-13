@@ -13,6 +13,7 @@ import { updateCustomer } from "@lib/data/customer";
 import Hyperlink from "@levelcrush/elements/hyperlink";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import AccountButton from "./account_button";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface DiscordValidationResult {
   discordHandle: string;
@@ -31,7 +32,7 @@ interface DiscordValidationResult {
 export default function LoginHelper() {
   const cookies = useCookies();
   const [loading, setLoading] = useState(false);
-  const { account } = useContext(AccountProviderContext);
+  const { account, accountFetch } = useContext(AccountProviderContext);
   const [loginError, setLoginError] = useState("");
 
   const router = useRouter();
@@ -39,20 +40,9 @@ export default function LoginHelper() {
   async function createCustomer(
     token: string,
     email: string,
-    data: DiscordValidationResult
+    metadata: Record<string, any>
   ) {
     try {
-      const metadata = {
-        "discord.id": data.discordId,
-        "discord.handle": data.discordHandle,
-        "discord.globalName": data.globalName,
-        "discord.server_member": data.inServer,
-        "discord.nicknames": data.nicknames,
-        "discord.admin": data.isAdmin,
-        "discord.moderator": data.isModerator,
-        "discord.email": data.email,
-      };
-
       await fetch(
         `${
           process.env["NEXT_PUBLIC_MEDUSA_BACKEND_URL"] || ""
@@ -96,10 +86,11 @@ export default function LoginHelper() {
       }
     ).then((res) => res.json());
 
-    return result.token;
+    return result.token as string;
   }
 
   function forceRedirect(
+    router: AppRouterInstance | undefined,
     redirectUrl: string,
     redirectType: "didLogin" = "didLogin"
   ) {
@@ -108,7 +99,11 @@ export default function LoginHelper() {
       ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
       : 0;
     windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    setTimeout(() => (window.location.href = windowUrl.toString()), 250);
+    if (!router) {
+      setTimeout(() => (window.location.href = windowUrl.toString()), 250);
+    } else {
+      router.push(windowUrl.toString());
+    }
   }
 
   async function doCallback() {
@@ -139,7 +134,7 @@ export default function LoginHelper() {
       );
 
       const data = await res.json();
-      const token = data.token;
+      let token = data.token;
       const sessionJson = (await sessReq.json()) as DiscordValidationResult;
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
@@ -155,26 +150,36 @@ export default function LoginHelper() {
 
       window.localStorage.setItem("medusa_jwt", token);
 
+      const metadata = {
+        "discord.id": sessionJson.discordId,
+        "discord.handle": sessionJson.discordHandle,
+        "discord.globalName": sessionJson.globalName,
+        "discord.server_member": sessionJson.inServer,
+        "discord.nicknames": sessionJson.nicknames,
+        "discord.admin": sessionJson.isAdmin,
+        "discord.moderator": sessionJson.isModerator,
+        "discord.booster": sessionJson.isBooster,
+        "discord.retired": sessionJson.isRetired,
+        "discord.email": sessionJson.email,
+      };
+
       if (shouldCreateCustomer) {
         console.log("Attempting to create your customer record");
-        await createCustomer(token, sessionJson.email, sessionJson);
+        await createCustomer(token, sessionJson.email, metadata);
 
         console.log("Attempting to refresh your token");
-        await refreshToken(token);
-      } else {
-        const metadata = {
-          "discord.id": sessionJson.discordId,
-          "discord.handle": sessionJson.discordHandle,
-          "discord.globalName": sessionJson.globalName,
-          "discord.server_member": sessionJson.inServer,
-          "discord.nicknames": sessionJson.nicknames,
-          "discord.admin": sessionJson.isAdmin,
-          "discord.moderator": sessionJson.isModerator,
-          "discord.booster": sessionJson.isBooster,
-          "discord.retired": sessionJson.isRetired,
-          "discord.email": sessionJson.email,
-        };
+        console.log("Starting with", token);
+        token = await refreshToken(token);
 
+        // update token again
+        cookies.set("_medusa_jwt", token, {
+          expires: 60 * 60 * 24 * 7,
+          sameSite: "strict",
+          secure: process.env.NODE_ENV === "production",
+        });
+
+        window.localStorage.setItem("medusa_jwt", token);
+      } else {
         console.log("Attempting to update your customer record");
         await updateCustomer({
           first_name: metadata["discord.globalName"],
@@ -196,15 +201,14 @@ export default function LoginHelper() {
 
       if (userRedirect) {
         //router.push(userRedirect);
-        forceRedirect(userRedirect);
+        forceRedirect(router, userRedirect);
       } else {
         //router.push("/");
-        forceRedirect("/");
+        forceRedirect(router, "/");
       }
       //window.location.href = "/";
     } catch (err) {
       setLoginError(`${err}`);
-      console.log(err.digest);
       console.log("REQ ERROR", err);
     }
     setLoading(false);
