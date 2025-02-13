@@ -1,7 +1,7 @@
 // src/components/Body.tsx
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import {
   PortableText,
   PortableTextComponent,
@@ -12,6 +12,7 @@ import ReactPlayer from "react-player/lazy";
 import { PortableTextBlock } from "sanity";
 import Image from "next/image";
 import { H1, H2, H3, H4, H5, H6 } from "@levelcrush/elements/headings";
+import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 
 /*
 const serializers = {
@@ -31,7 +32,19 @@ const customComponents = {
     h4: ({ children }) => <H4>{children}</H4>,
     h5: ({ children }) => <H5>{children}</H5>,
     h6: ({ children }) => <H6>{children}</H6>,
-    normal: ({ children }) => <p className="my-4">{children}</p>,
+    normal: ({children}) => {  
+      const {account} = useContext(AccountProviderContext);
+      
+      // replace variables
+      if(children instanceof Array) { 
+        for(let i = 0; i < children.length;i++) { 
+          if(typeof children[i] === "string" && ((children[i]) as string).includes("{{DisplayName}}")) {
+            children[i] = (children[i] as string).replaceAll("{{DisplayName}}", account?.first_name || "bud");
+          } 
+        }
+      }
+      return (<p className="my-4">{children}</p>);
+    }
   },
   types: {
     youtube: ({ value }) => {
