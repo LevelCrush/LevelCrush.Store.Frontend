@@ -41,7 +41,6 @@ const Payment = ({
   console.log(selectedPaymentMethod);
   const isStripe = isStripeFunc(selectedPaymentMethod);
   const stripeReady = useContext(StripeContext);
-  console.log("Stripe Ready", stripeReady);
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
@@ -114,7 +113,7 @@ const Payment = ({
   }, [isOpen]);
 
   return (
-    <div className="bg-transparent">
+    <div className=" bg-ui-bg-base p-4">
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"

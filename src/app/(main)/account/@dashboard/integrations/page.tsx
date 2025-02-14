@@ -5,19 +5,17 @@ import AddressBook from "@modules/account/components/address-book";
 
 import { getRegion } from "@lib/data/regions";
 import { retrieveCustomer } from "@lib/data/customer";
-import AccountLinkBook from "@levelcrush/accountLinkBook";
+import AccountLinkBook from "@levelcrush/profile/integrations/accountLinkBook";
+import { getCacheTag } from "@lib/data/cookies";
+import { revalidateTag } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Integrations",
   description: "View your profile integrations",
 };
 
-export default async function Integrations(props: {
-  params: Promise<{ countryCode: string }>;
-}) {
-  const params = await props.params;
-  const { countryCode } = params;
-  const customer = await retrieveCustomer();
+export default async function Integrations() {
+  const customer = await retrieveCustomer("no-store");
 
   if (!customer) {
     notFound();

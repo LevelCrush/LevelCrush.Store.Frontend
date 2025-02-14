@@ -1,25 +1,34 @@
+"use client";
+
+import { AccountProviderContext } from "@levelcrush/providers/account_provider"
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
-import { useActionState } from "react"
+import { useActionState, useContext } from "react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
 }
 
 const Login = ({ setCurrentView }: Props) => {
-  const [message, formAction] = useActionState(login, null)
+
+  const { account, accountFetch } = useContext(AccountProviderContext);
+  const [message, formAction] = useActionState(async (_currentState : unknown, formData: FormData) => {
+    const res = await login(_currentState, formData);
+    await accountFetch();
+    return res;
+  }, null);
 
   return (
     <div
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
+      <h1 className="text-large-semi uppercase mb-6">Hey there bud.</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+        Sign in to the Level Crush network
       </p>
       <form className="w-full" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">

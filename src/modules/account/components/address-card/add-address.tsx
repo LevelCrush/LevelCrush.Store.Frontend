@@ -1,50 +1,72 @@
-"use client"
+"use client";
 
-import { Plus } from "@medusajs/icons"
-import { Button, Heading } from "@medusajs/ui"
-import { useEffect, useState, useActionState } from "react"
+import { Plus } from "@medusajs/icons";
+import { Button, Heading } from "@medusajs/ui";
+import { useEffect, useState, useActionState } from "react";
 
-import useToggleState from "@lib/hooks/use-toggle-state"
-import CountrySelect from "@modules/checkout/components/country-select"
-import Input from "@modules/common/components/input"
-import Modal from "@modules/common/components/modal"
-import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { HttpTypes } from "@medusajs/types"
-import { addCustomerAddress } from "@lib/data/customer"
+import useToggleState from "@lib/hooks/use-toggle-state";
+import CountrySelect from "@modules/checkout/components/country-select";
+import Input from "@modules/common/components/input";
+import Modal from "@modules/common/components/modal";
+import { SubmitButton } from "@modules/checkout/components/submit-button";
+import { HttpTypes } from "@medusajs/types";
+import { addCustomerAddress } from "@lib/data/customer";
+import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const AddAddress = ({
   region,
   addresses,
 }: {
-  region: HttpTypes.StoreRegion
-  addresses: HttpTypes.StoreCustomerAddress[]
+  region: HttpTypes.StoreRegion;
+  addresses: HttpTypes.StoreCustomerAddress[];
 }) => {
-  const [successState, setSuccessState] = useState(false)
-  const { state, open, close: closeModal } = useToggleState(false)
+  const [successState, setSuccessState] = useState(false);
+  const { state, open, close: closeModal } = useToggleState(false);
 
   const [formState, formAction] = useActionState(addCustomerAddress, {
     isDefaultShipping: addresses.length === 0,
     success: false,
     error: null,
-  })
+  });
+
+  const router = useRouter();
 
   const close = () => {
-    setSuccessState(false)
-    closeModal()
+    setSuccessState(false);
+    closeModal();
+  };
+
+  function forceRedirect(
+    router: AppRouterInstance,
+    redirectType: "addAddress" | "editAddress" = "addAddress"
+  ) {
+    const windowUrl = new URL(window.location.href);
+    const amount = windowUrl.searchParams.has(redirectType)
+      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+      : 0;
+    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+    if (router) {
+      router.push(windowUrl.toString());
+    } else {
+      window.location.href = windowUrl.toString();
+    }
   }
 
   useEffect(() => {
     if (successState) {
-      close()
+      close();
+      forceRedirect(router);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [successState])
+  }, [successState]);
 
   useEffect(() => {
     if (formState.success) {
-      setSuccessState(true)
+      setSuccessState(true);
+      forceRedirect(router);
     }
-  }, [formState])
+  }, [formState]);
 
   return (
     <>
@@ -161,7 +183,7 @@ const AddAddress = ({
         </form>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default AddAddress
+export default AddAddress;
