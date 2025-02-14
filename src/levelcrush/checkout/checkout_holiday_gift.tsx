@@ -50,6 +50,8 @@ function CustomerAddress(props: {
   address?: StoreCustomerAddress;
   region: StoreRegion;
 }) {
+  const { pending } = useFormStatus();
+
   const address = props.address || ({ id: "" } as StoreCustomerAddress);
 
   const lines = [];
@@ -77,6 +79,7 @@ function CustomerAddress(props: {
       className="group my-4 border-white border-solid border-[1px] data-[checked]:border-yellow-400 p-4"
       value={address.id}
       as="div"
+      disabled={pending}
     >
       <Label className=" uppercase text-4xl">
         {props.address
@@ -152,6 +155,27 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
       disabled={pending}
     >
       <Legend>Enter your shipping address. </Legend>
+      <p className="text-yellow-400 my-4">
+        Note: Due to International Shipping and Customs. If you live outside of
+        the United States of America. Provide the following
+        <ul className="list-decimal list-inside my-4">
+          <li>You're legimate first and last name</li>
+          <li>Phone Number</li>
+        </ul>
+        <br />
+        We will do the following if you live outside of the United States of
+        America.
+        <ul className="list-disc list-inside my-2">
+          <li>
+            Ship with the information provided. Please make sure it is accurate.
+          </li>
+          <li>
+            Pay for any Custom Duty fees if we have the choice and are required.
+          </li>
+          <li>If a gift gets held up at customs. We will do our best to resolve it.</li>
+        </ul>
+        <br />
+      </p>
       <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
         <Field>
           <Input
@@ -236,6 +260,15 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
             </Select.Content>
           </Select>
         </Field>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 my-4 gap-y-4 gap-x-4">
+        <Input
+          label="Phone"
+          name="shipping_address.phone"
+          autoComplete="address-phone"
+          data-testid="phone-input"
+          required={false}
+        />
       </div>
     </Fieldset>
   );
