@@ -251,7 +251,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
     error: null,
     response: {},
   });
-  
+
   const [targetGift, setTargetGift] = useState(
     determineGiftType(customer?.metadata || {})
   );
@@ -289,15 +289,7 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
 
   return (
     <>
-      {props.page.hero ? (
-        <Hero backgroundUrl={props.page.hero}>
-          <H2 className="text-yellow-400 text-6xl shadow">
-            Claim your Holiday Gift!
-          </H2>
-        </Hero>
-      ) : (
-        <></>
-      )}
+      {props.page.hero ? <Hero backgroundUrl={props.page.hero}></Hero> : <></>}
       <ContainerInner className="mt-0">
         <H2>Claim Your Holiday Gift</H2>
         <PortableBody blocks={props.page.body} />

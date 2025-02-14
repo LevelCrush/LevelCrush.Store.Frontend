@@ -25,7 +25,7 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
       }
       style={{
         backgroundImage: `url(${props.backgroundUrl || "/hero.jpg"})`,
-        minHeight: "30rem",
+        minHeight: "50rem",
       }}
     >
       

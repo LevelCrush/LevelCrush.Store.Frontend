@@ -12,6 +12,7 @@ import useDeepCompareEffect, {
 } from "use-deep-compare-effect";
 import { isObject } from "@lib/util/isEmpty";
 import { signout } from "@lib/data/customer";
+import AccountButton from "./account/account_button";
 
 export interface OffcanvasContextDefinition {
   opened: boolean;
@@ -257,6 +258,7 @@ export const OffCanvas = (props: React.PropsWithChildren<OffCanvasProps>) => {
               );
             })}
           </ul>
+          {account ? <></> : <div className="w-[95%] mx-auto my-4"><AccountButton /></div>}
         </nav>
         <div className="offcanvas-content min-h-screen h-auto  block transition-all duration-300">
           {props.children}
