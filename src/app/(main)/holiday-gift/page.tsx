@@ -126,24 +126,14 @@ export default async function HolidayGiftPage() {
     return LinkBungie();
   }
 
-  if (metadata["gift.h24"] === true) {
-    return (
-      <ContainerInner>
-        <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center mx-auto">
-          <H2 className="w-full text-center">Already claimed.</H2>
-          <HyperlinkButton className="mt-8 mb-4" href="/" intention={"normal"}>
-            Go Home
-          </HyperlinkButton>
-        </div>
-      </ContainerInner>
-    );
-  }
-
   const page = await cms.page("/holiday-gift");
   if (!page) {
     console.warn("No CMS Page found");
     notFound();
   }
+
+
+
 
   const rasputinRes = await fetch(
     `${process.env["NEXT_PUBLIC_RASPUTIN"]}/member/${encodeURIComponent(

@@ -158,24 +158,29 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
       <p className="text-yellow-400 my-4">
         Note: Due to International Shipping and Customs. If you live outside of
         the United States of America. Provide the following
-        <ul className="list-decimal list-inside my-4">
-          <li>You're legimate first and last name</li>
-          <li>Phone Number</li>
-        </ul>
-        <br />
+      </p>
+      <ul className="text-yellow-400 list-decimal list-inside my-4">
+        <li>You're legimate first and last name</li>
+        <li>Phone Number</li>
+      </ul>
+      <p className="text-yellow-400 my-4">
         We will do the following if you live outside of the United States of
         America.
-        <ul className="list-disc list-inside my-2">
-          <li>
-            Ship with the information provided. Please make sure it is accurate.
-          </li>
-          <li>
-            Pay for any Custom Duty fees if we have the choice and are required.
-          </li>
-          <li>If a gift gets held up at customs. We will do our best to resolve it.</li>
-        </ul>
-        <br />
-        If you live in the United States. You can ignore the above message. Please ship with accurate information.
+      </p>
+      <ul className="text-yellow-400 list-disc list-inside my-2">
+        <li>
+          Ship with the information provided. Please make sure it is accurate.
+        </li>
+        <li>
+          Pay for any Custom Duty fees if we have the choice and are required.
+        </li>
+        <li>
+          If a gift gets held up at customs. We will do our best to resolve it.
+        </li>
+      </ul>
+      <p className="text-yellow-400 my-4">
+        If you live in the United States. You can ignore the above message.
+        Please ship with accurate information.
       </p>
       <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
         <Field>
@@ -307,16 +312,28 @@ export default function CheckoutHolidayGift(props: CheckoutHolidayGiftProps) {
 
   const metadata = account?.metadata || {};
   if (metadata["gift.h24"] === true) {
+    console.log("Page props");
     // this is the same as the page level. Should probably move these into one function at some point
     return (
-      <ContainerInner>
-        <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center mx-auto">
-          <H2 className="w-full text-center">Already claimed.</H2>
-          <HyperlinkButton className="mt-8 mb-4" href="/" intention={"normal"}>
-            Go Home
-          </HyperlinkButton>
-        </div>
-      </ContainerInner>
+      <>
+        {props.page.hero ? (
+          <Hero backgroundUrl={props.page.hero}></Hero>
+        ) : (
+          <></>
+        )}
+        <ContainerInner>
+          <div className="w-full max-w-[50rem] p-4 bg-[rgba(0,0,0,.85)] flex justify-center flex-col items-center mx-auto">
+            <H2 className="w-full text-center">Already claimed.</H2>
+            <HyperlinkButton
+              className="mt-8 mb-4"
+              href="/"
+              intention={"normal"}
+            >
+              Go Home
+            </HyperlinkButton>
+          </div>
+        </ContainerInner>
+      </>
     );
   }
 
