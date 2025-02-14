@@ -175,6 +175,7 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
           <li>If a gift gets held up at customs. We will do our best to resolve it.</li>
         </ul>
         <br />
+        If you live in the United States. You can ignore the above message. Please ship with accurate information.
       </p>
       <div className="my-4 grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-y-0 gap-x-4">
         <Field>
@@ -182,7 +183,6 @@ function AddressFieldSet(props: { customer: StoreCustomer | null }) {
             label="First Name"
             name="shipping_address.first_name"
             type="text"
-            defaultValue={account?.first_name || ""}
             required={true}
           ></Input>
         </Field>
