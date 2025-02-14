@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player/lazy";
+import { twMerge } from "tailwind-merge";
 
 export interface HeroProps {
   backgroundUrl?: string;
@@ -19,16 +20,16 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
 
   return (
     <div
-      className={
-        "flex-auto basis-full relative top-[-4.5rem] left-0 hero bg-cover bg-center aspect-video h-auto flex flex-col items-center justify-center border-b-8 border-solid border-cyan-400 shadow-[0px_.3rem_1rem_2px_rgba(0,0,0,0.4)] " +
-        (props.className || "")
-      }
+      className={twMerge(
+        "flex-auto basis-full relative top-[-4.5rem] left-0 hero bg-cover bg-center h-auto flex flex-col items-center justify-center border-b-8 border-solid border-cyan-400 shadow-[0px_.3rem_1rem_2px_rgba(0,0,0,0.4)] ",
+        props.className || "",
+        props.youtubeUrl ? "aspect-video" : "min-h-[15rem] md:min-h-[30rem] lg:min-h-[50rem]"
+      )}
       style={{
         backgroundImage: `url(${props.backgroundUrl || "/hero.jpg"})`,
         backgroundPosition: "center center",
       }}
     >
-      
       {props.youtubeUrl && hasWindow ? (
         <>
           <div className="absolute top-0 left-0 bg-black opacity-[.65] w-full h-full"></div>
@@ -42,7 +43,6 @@ export default function Hero(props: React.PropsWithChildren<HeroProps>) {
               width="100%"
               height="100%"
               loop={true}
-      
               config={{
                 youtube: {
                   embedOptions: {
