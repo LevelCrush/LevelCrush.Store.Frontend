@@ -7,9 +7,14 @@ import { MetadataType, StoreCustomer } from "@medusajs/types";
 import { Suspense, useContext, useState } from "react";
 import { updateCustomer } from "@lib/data/customer";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
-import useDeepCompareEffect from "use-deep-compare-effect";
+import useDeepCompareEffect, { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
+import {
+  Platform,
+  platformStart,
+  platformUnlink,
+} from "@levelcrush/sdk/platforms";
 
 interface BungieValidationResult {
   membershipId: string;
@@ -32,7 +37,7 @@ export type AccountLinkPlatforMetaValueType = "string" | "boolean";
 
 interface AccountLinkPlatformProps {
   title: string;
-  platform: "discord" | "bungie";
+  platform: Platform;
   badges: {
     name: string;
     metakeyResult: string;
@@ -46,11 +51,7 @@ interface AccountLinkPlatformProps {
 export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
   const { account, accountFetch } = useContext(AccountProviderContext);
 
-  if (!account) {
-    return <></>;
-  }
-
-  const [metadata, setMetadata] = useState(account.metadata || {});
+  const [metadata, setMetadata] = useState(account?.metadata || {});
   const [accountId, setAccountId] = useState(
     (metadata[props.metakeyAccountID] as string) || ""
   );
@@ -61,14 +62,15 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
 
   const router = useRouter();
 
-  useDeepCompareEffect(() => {
-    setAccountId((metadata[props.metakeyAccountID] as string) || "");
+  useDeepCompareEffectNoCheck(() => {
+    const meta = metadata || {};
+    setAccountId((meta[props.metakeyAccountID] as string) || "");
     setDisplayName(
-      (metadata[props.metakeyDisplayName] as string) || "NOT LINKED"
+      (meta[props.metakeyDisplayName] as string) || "NOT LINKED"
     );
   }, [metadata]);
 
-  useDeepCompareEffect(() => {
+  useDeepCompareEffectNoCheck(() => {
     if (!account) {
       setMetadata({});
     } else {
@@ -76,101 +78,8 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
     }
   }, [account]);
 
-  async function checkPlatformSession() {
-    const req = await fetch(
-      `${
-        process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
-      }/platform/${encodeURIComponent(props.platform)}/session`,
-      {
-        method: "GET",
-        mode: "cors",
-        cache: "no-store",
-        credentials: "include",
-      }
-    );
-
-    const data = await req.json();
-    return data;
-  }
-
-  function forceRedirect(
-    router: AppRouterInstance | undefined,
-    redirectType: "postLink" | "unlink" = "postLink"
-  ) {
-    const windowUrl = new URL(window.location.href);
-    const amount = windowUrl.searchParams.has(redirectType)
-      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
-      : 0;
-    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    if (router) {
-      router.push(windowUrl.toString());
-    } else {
-      window.location.href = windowUrl.toString();
-    }
-  }
-
-  async function unlinkPlatform() {
-    if (props.platform === "discord") {
-      return;
-    }
-    const platformKeys = Object.keys(metadata).filter((v) =>
-      v.startsWith(props.platform)
-    );
-    const newMetadata = {} as Record<string, unknown>;
-    for (const key of platformKeys) {
-      newMetadata[key] = "";
-    }
-
-    await updateCustomer({
-      metadata: newMetadata,
-    });
-
-    forceRedirect(router, "unlink");
-    return;
-
-    await accountFetch();
-  }
-
-  function startLogin() {
-    var childWindow = window.open(
-      `${
-        process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
-      }/platform/${encodeURIComponent(props.platform)}/login`,
-      "_blank"
-    );
-    if (childWindow) {
-      var intervalHandle = setInterval(async () => {
-        if (childWindow?.closed) {
-          clearInterval(intervalHandle);
-          const data = await checkPlatformSession();
-
-          if (props.platform == "bungie") {
-            const bungieValidation = data as BungieValidationResult;
-            if (
-              bungieValidation.membershipId &&
-              bungieValidation.membershipId.length > 0
-            ) {
-              const newMetadata = {} as Record<string, unknown>;
-              newMetadata["bungie.id"] = bungieValidation.membershipId || "";
-              newMetadata["bungie.handle"] = bungieValidation.displayName || "";
-              newMetadata["bungie.platform"] =
-                bungieValidation.membershipType || -1;
-              newMetadata["bungie.clan_member"] =
-                bungieValidation.inNetworkClan;
-
-              await updateCustomer({
-                metadata: newMetadata,
-              });
-
-              //setTimeout(() => (window.location.reload()), 250);
-              forceRedirect(router, "postLink");
-              return;
-            }
-          }
-          await accountFetch();
-        }
-      }, 1000);
-    }
+  if (!account) {
+    return <></>;
   }
 
   function badgeResultValid(input: unknown) {
@@ -219,19 +128,19 @@ export function AccountLinkPlatform(props: AccountLinkPlatformProps) {
       </h3>
       <p className="my-4">{displayName}</p>
       <Button
-        disabled={props.platform === "discord"}
         className="w-full md:w-auto md:min-w-40 text-center"
         variant={accountId.length > 0 ? "danger" : "primary"}
+        disabled={props.platform === "discord"}
         onClick={
-          props.platform !== "discord"
-            ? (ev) => {
+          props.platform === "discord"
+            ? undefined
+            : (ev) => {
                 if (accountId && accountId.length > 0) {
-                  unlinkPlatform();
+                  platformUnlink(props.platform, account, router);
                 } else {
-                  startLogin();
+                  platformStart(props.platform, router);
                 }
               }
-            : undefined
         }
       >
         {accountId.length > 0 ? (

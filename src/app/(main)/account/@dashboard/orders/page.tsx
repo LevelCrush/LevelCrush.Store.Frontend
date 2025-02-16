@@ -1,21 +1,25 @@
-import { Metadata } from "next"
+import { Metadata } from "next";
 
-import OrderOverview from "@modules/account/components/order-overview"
-import { notFound } from "next/navigation"
-import { listOrders } from "@lib/data/orders"
-import Divider from "@modules/common/components/divider"
-import TransferRequestForm from "@modules/account/components/transfer-request-form"
+import OrderOverview from "@modules/account/components/order-overview";
+import { notFound, redirect } from "next/navigation";
+import { listOrders } from "@lib/data/orders";
+import Divider from "@modules/common/components/divider";
+import TransferRequestForm from "@modules/account/components/transfer-request-form";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Orders",
   description: "Overview of your previous orders.",
-}
+};
 
 export default async function Orders() {
-  const orders = await listOrders(undefined,undefined,undefined,"no-store");
+  const orders = await listOrders(undefined, undefined, undefined, "no-store");
 
   if (!orders) {
-    notFound()
+    const head = await headers();
+    const pageUrl = head.get("x-url") || "/";
+    redirect(`/account?returnTo=${encodeURIComponent(pageUrl)}`);
+    return;
   }
 
   return (
@@ -33,5 +37,5 @@ export default async function Orders() {
         <TransferRequestForm />
       </div>
     </div>
-  )
+  );
 }

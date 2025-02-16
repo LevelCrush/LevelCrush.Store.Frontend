@@ -10,12 +10,14 @@ import CheckoutHolidayGift, {
   RasputinTitlesResponse,
 } from "@levelcrush/checkout/checkout_holiday_gift";
 import { getRegion } from "@lib/data/regions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import cms from "@levelcrush/cms";
 import ContainerInner from "@levelcrush/elements/container_inner";
 import Button, { HyperlinkButton } from "@levelcrush/elements/button";
 import { revalidateTag } from "next/cache";
 import { getCacheTag } from "@lib/data/cookies";
+import { headers } from "next/headers";
+import { AccountLinkPlatformBungie, AccountLinkPlatformDiscord } from "@levelcrush/profile/integrations/accountLinkBook";
 
 export const metadata: Metadata = {
   title: "Holiday Gift 2024 | Level Crush",
@@ -25,13 +27,13 @@ export const metadata: Metadata = {
 function LinkDiscord() {
   return (
     <ContainerInner>
-      <H2 className="text-center">Please Login with Discord</H2>
-      <p className="my-4 text-center">
-        This gift is personal, private and intended only for Level Crush or
-        Level Stomp clan members
+      <H2 >Please link your discord.</H2>
+      <p className="my-4">
+        This gift is personal, private and intended only for Level Crush server
+        members
       </p>
-      <div className="w-full md:max-w-[30rem] mx-auto">
-        <AccountButton />
+      <div>
+       <AccountLinkPlatformDiscord />
       </div>
     </ContainerInner>
   );
@@ -66,26 +68,7 @@ function LinkBungie() {
           destiny clan.{" "}
         </li>
       </ul>
-      <AccountLinkPlatform
-        title="Bungie"
-        metakeyDisplayName="bungie.handle"
-        metakeyAccountID="bungie.id"
-        platform="bungie"
-        badges={[
-          {
-            name: "Validated",
-            metakeyResult: "bungie.id",
-            tooltip_valid: "Your Bungie account has been validated",
-            tooltip_invalid: "Link your bungie account to validate",
-          },
-          {
-            name: "Clan",
-            metakeyResult: "bungie.clan_member",
-            tooltip_valid: "Your in an affiliated clan",
-            tooltip_invalid: "You are not in an affiliated clan",
-          },
-        ]}
-      />
+      <AccountLinkPlatformBungie />
     </ContainerInner>
   );
 }
@@ -100,7 +83,11 @@ export default async function HolidayGiftPage() {
   }
 
   if (!account) {
-    return LinkDiscord();
+
+    const head = await headers();
+    const pageUrl = head.get('x-url') || "/";
+    redirect(`/account?returnTo=${encodeURIComponent(pageUrl)}`);
+    return;
   }
 
   const metadata = account.metadata || {};
@@ -131,9 +118,6 @@ export default async function HolidayGiftPage() {
     console.warn("No CMS Page found");
     notFound();
   }
-
-
-
 
   const rasputinRes = await fetch(
     `${process.env["NEXT_PUBLIC_RASPUTIN"]}/member/${encodeURIComponent(

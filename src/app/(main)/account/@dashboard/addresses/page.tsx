@@ -1,10 +1,11 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import AddressBook from "@modules/account/components/address-book";
 
 import { getRegion } from "@lib/data/regions";
 import { retrieveCustomer } from "@lib/data/customer";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Addresses",
@@ -20,7 +21,10 @@ export default async function Addresses(props: {
   const region = await getRegion(countryCode || "us");
 
   if (!customer || !region) {
-    notFound();
+    const head = await headers();
+    const pageUrl = head.get("x-url") || "/";
+    redirect(`/account?returnTo=${encodeURIComponent(pageUrl)}`);
+    return;
   }
 
   return (

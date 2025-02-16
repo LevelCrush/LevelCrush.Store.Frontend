@@ -13,7 +13,7 @@ export default function Login() {
   // lol for now this is it.
   // eventuially itll be good to implement the client side logic on this page
   // so it happens automatically
-  notFound();
+  //notFound();
 
   return <LoginTemplate />
 }

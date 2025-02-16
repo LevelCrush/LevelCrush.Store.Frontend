@@ -31,9 +31,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const route = `/${slugs.join("/")}`;
     const page = await cms.page(route);
     if (!page) {
+      console.log("Could not find route", route);
       notFound();
     }
-
+ 
     const title = page.tabName || "Level Crush";
     const description = page.metaDescription || "";
 

@@ -2,7 +2,7 @@
 
 import { sdk } from "@lib/config";
 import medusaError from "@lib/util/medusa-error";
-import { HttpTypes } from "@medusajs/types";
+import { HttpTypes, StoreCustomer } from "@medusajs/types";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import {
   removeAuthToken,
   setAuthToken,
 } from "./cookies";
+import { create } from "lodash";
 
 export const retrieveCustomer = async (
   cache: "force-cache" | "no-store" = "force-cache"
@@ -64,6 +65,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
     phone: formData.get("phone") as string,
   };
 
+  let createdCustomer = null as StoreCustomer | null;
   try {
     const token = await sdk.auth.register("customer", "emailpass", {
       email: customerForm.email,
@@ -93,11 +95,17 @@ export async function signup(_currentState: unknown, formData: FormData) {
     revalidateTag(customerCacheTag);
 
     await transferCart();
-
-    return createdCustomer;
   } catch (error: any) {
     return error.toString();
   }
+
+  if (formData.has("returnTo")) {
+    console.log("Returning to");
+    redirect(formData.get("returnTo") as string);
+    // the rest is unreachable in this scenario
+  }
+
+  return createdCustomer;
 }
 
 export async function login(_currentState: unknown, formData: FormData) {
@@ -106,11 +114,16 @@ export async function login(_currentState: unknown, formData: FormData) {
 
   try {
     await sdk.auth
-      .login("customer", "emailpass", { email, password })
+      .login("customer", "levelcrush-auth", { email, password })
       .then(async (token) => {
-        await setAuthToken(token as string);
-        const customerCacheTag = await getCacheTag("customers");
-        revalidateTag(customerCacheTag);
+        if (token.location) {
+          console.warn("Served a redirect instead of login. This is not the expected authentication flow");
+          throw new Error("Unexpected authentication flow");
+        } else {
+          await setAuthToken(token as string);
+          const customerCacheTag = await getCacheTag("customers");
+          revalidateTag(customerCacheTag);
+        }
       });
   } catch (error: any) {
     return error.toString();
@@ -121,9 +134,18 @@ export async function login(_currentState: unknown, formData: FormData) {
   } catch (error: any) {
     return error.toString();
   }
+
+  if (formData.has("returnTo")) {
+    console.log("Attempting redirect");
+    redirect(formData.get("returnTo") as string);
+  }
 }
 
-export async function signout(countryCode: string, doRedirect = true, redirectUrl = "/logout") {
+export async function signout(
+  countryCode: string,
+  doRedirect = true,
+  redirectUrl = "/logout"
+) {
   await sdk.auth.logout();
   removeAuthToken();
   revalidateTag("auth");

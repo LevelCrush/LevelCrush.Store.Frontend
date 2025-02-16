@@ -14,6 +14,7 @@ import Hyperlink from "@levelcrush/elements/hyperlink";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import AccountButton from "./account_button";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { platformMetadataDiscord } from "@levelcrush/sdk/platforms";
 
 interface DiscordValidationResult {
   discordHandle: string;
@@ -150,18 +151,7 @@ export default function LoginHelper() {
 
       window.localStorage.setItem("medusa_jwt", token);
 
-      const metadata = {
-        "discord.id": sessionJson.discordId,
-        "discord.handle": sessionJson.discordHandle,
-        "discord.globalName": sessionJson.globalName,
-        "discord.server_member": sessionJson.inServer,
-        "discord.nicknames": sessionJson.nicknames,
-        "discord.admin": sessionJson.isAdmin,
-        "discord.moderator": sessionJson.isModerator,
-        "discord.booster": sessionJson.isBooster,
-        "discord.retired": sessionJson.isRetired,
-        "discord.email": sessionJson.email,
-      };
+      const metadata = platformMetadataDiscord(sessionJson);
 
       if (shouldCreateCustomer) {
         console.log("Attempting to create your customer record");
@@ -179,6 +169,18 @@ export default function LoginHelper() {
 
         window.localStorage.setItem("medusa_jwt", token);
       } else {
+        console.log("Attempting to refresh your token");
+        token = await refreshToken(token);
+
+        // update token again
+        cookies.set("_medusa_jwt", token, {
+          expires: 60 * 60 * 24 * 7,
+          sameSite: "strict",
+          secure: process.env.NODE_ENV === "production",
+        });
+
+        window.localStorage.setItem("medusa_jwt", token);
+
         console.log("Attempting to update your customer record");
         await updateCustomer({
           first_name: metadata["discord.globalName"],

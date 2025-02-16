@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import AddressBook from "@modules/account/components/address-book";
 
@@ -8,6 +8,7 @@ import { retrieveCustomer } from "@lib/data/customer";
 import AccountLinkBook from "@levelcrush/profile/integrations/accountLinkBook";
 import { getCacheTag } from "@lib/data/cookies";
 import { revalidateTag } from "next/cache";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Integrations",
@@ -18,7 +19,10 @@ export default async function Integrations() {
   const customer = await retrieveCustomer("no-store");
 
   if (!customer) {
-    notFound();
+    const head = await headers();
+    const pageUrl = head.get("x-url") || "/";
+    redirect(`/account?returnTo=${encodeURIComponent(pageUrl)}`);
+    return;
   }
 
   return (
