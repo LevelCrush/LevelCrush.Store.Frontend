@@ -6,6 +6,7 @@ import { H4 } from "@levelcrush/elements/headings";
 import { AccountProviderContext } from "@levelcrush/providers/account_provider";
 import { sdk } from "@lib/config";
 import { Label } from "@medusajs/ui";
+import { LOGIN_VIEW } from "@modules/account/templates/login-template";
 import Input from "@modules/common/components/input";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
@@ -20,9 +21,9 @@ import { useFormStatus } from "react-dom";
 
 function FormControls(props: { message: string }) {
   const { pending } = useFormStatus();
-  const disabled = props.message == "Sent!" || pending;
+  const disabled = props.message.includes("Sent") || pending;
   return (
-    <Fieldset disabled={pending}>
+    <Fieldset disabled={disabled}>
       <Field>
         <div className="flex flex-col w-full gap-y-2">
           <Label className={pending ? "text-gray-500" : ""}>
@@ -37,8 +38,16 @@ function FormControls(props: { message: string }) {
             required
             data-testid="email-input"
           />
-          {props.message ? <p className="text-yellow-400">{props.message}</p> : <></>}
-          <Button type="submit" intention={!pending ? "normal" : "inactive"}>
+          {props.message ? (
+            <p className="text-green-400">{props.message}</p>
+          ) : (
+            <></>
+          )}
+          <Button
+            type="submit"
+            disabled={disabled}
+            intention={!disabled ? "normal" : "inactive"}
+          >
             Send code to Email
           </Button>
         </div>
@@ -58,7 +67,7 @@ export default function ForgotView(props: {
         await sdk.auth.resetPassword("customer", "levelcrush-auth", {
           identifier: formData.get("email") as string,
         });
-        return "Sent!";
+        return "Sent! Check your email";
       } else {
         return "No email provided";
       }
@@ -76,12 +85,6 @@ export default function ForgotView(props: {
     );
   }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem(
-      "forgotReturnTo",
-      searchParams.get("returnTo") || ""
-    );
-  }, [searchParams]);
 
   return (
     <div

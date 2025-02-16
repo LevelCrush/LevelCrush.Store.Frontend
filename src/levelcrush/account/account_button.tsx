@@ -74,9 +74,6 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
       try {
         const json = await result.json();
         if (json.location) {
-          //window.location.href = json.location;
-          console.log("Pushing", window.location.href);
-          console.log(process.env["NEXT_PUBLIC_BASE_URL"], window.location.hostname);
           router.push(json.location);
           return;
         }
@@ -89,7 +86,11 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
         console.log("Err", err);
       }
     } else {
-      router.push(`/account?returnTo=${encodeURIComponent(returnToUrl)}`);
+      if (window.location.href.includes("/account?")) {
+        router.push("/account"); // just push back to normal account, no redirect
+      } else {
+        router.push(`/account?returnTo=${encodeURIComponent(returnToUrl)}`);
+      }
     }
   }
 

@@ -6,13 +6,13 @@ import ContainerInner from "@levelcrush/elements/container_inner";
 import { H4 } from "@levelcrush/elements/headings";
 import { sdk } from "@lib/config";
 import Input from "@modules/common/components/input";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export function FormControls(props: { message: string }) {
   const { pending } = useFormStatus();
-  const disabled = props.message == "Sent!" || pending;
+  const disabled = props.message.includes("success") || pending;
 
   return (
     <Fieldset disabled={disabled}>
@@ -44,7 +44,15 @@ export function FormControls(props: { message: string }) {
         </div>
       </Field>
       {props.message ? (
-        <p className={props.message.includes("success") ? "text-green-500 mt-4 mb-8" : "text-yellow-400 mt-4 mb-8"}>{props.message}</p>
+        <p
+          className={
+            props.message.includes("success")
+              ? "text-green-500 mt-4 mb-8"
+              : "text-yellow-400 mt-4 mb-8"
+          }
+        >
+          {props.message}
+        </p>
       ) : (
         <></>
       )}
@@ -56,8 +64,7 @@ export function FormControls(props: { message: string }) {
 }
 
 export default function ResetPassword() {
-
-  const [forgotRedirectTo , setForgotRedirectTo] = useState("");
+  const [forgotRedirectTo, setForgotRedirectTo] = useState("");
   const [message, formAction] = useActionState(
     async (_currentState: unknown, formData: FormData) => {
       const password = formData.get("password") || "";
@@ -91,8 +98,9 @@ export default function ResetPassword() {
         );
 
         const json = await result.json();
+
         return json.success
-          ? "Password reset successfully"
+          ? "Password reset successfully. Taking you back to the login  page in a moment"
           : "Failed to reset password";
       } catch (err) {
         return `${err}`;
@@ -105,6 +113,16 @@ export default function ResetPassword() {
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (message?.includes("success")) {
+      setTimeout(() => {
+        router.push("/account");
+      }, 2000);
+    }
+  }, [message]);
 
   useEffect(() => {
     setForgotRedirectTo(window.localStorage.getItem("forgotReturnTo") || "");

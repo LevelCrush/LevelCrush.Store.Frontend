@@ -9,7 +9,7 @@ import ErrorMessage from "@modules/checkout/components/error-message";
 import { SubmitButton } from "@modules/checkout/components/submit-button";
 import Input from "@modules/common/components/input";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
-import { useActionState, useContext } from "react";
+import { useActionState, useContext, useEffect } from "react";
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void;
