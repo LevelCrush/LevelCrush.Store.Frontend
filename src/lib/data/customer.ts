@@ -112,16 +112,20 @@ export async function login(_currentState: unknown, formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-
+  console.log("Attempting to login");
 
   try {
+
+    console.log("Logging in via levelcrush-auth");
     await sdk.auth
       .login("customer", "levelcrush-auth", { email, password })
       .then(async (token) => {
+        console.log("Login authentication did occur");
         if (token.location) {
           console.warn("Served a redirect instead of login. This is not the expected authentication flow");
           throw new Error("Unexpected authentication flow");
         } else {
+          console.log("normal login procedure found for email/pass");
           await setAuthToken(token as string);
           const customerCacheTag = await getCacheTag("customers");
           revalidateTag(customerCacheTag);
