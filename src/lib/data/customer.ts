@@ -101,7 +101,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
   if (formData.has("returnTo")) {
     console.log("Returning to");
-    redirect(formData.get("returnTo") as string);
+    redirect(formData.get("returnTo") as string || "/");
     // the rest is unreachable in this scenario
   }
 
@@ -143,7 +143,7 @@ export async function login(_currentState: unknown, formData: FormData) {
 
   if (formData.has("returnTo")) {
     console.log("Attempting redirect");
-    redirect(formData.get("returnTo") as string);
+    redirect(formData.get("returnTo") as string || "/");
   }
 }
 

@@ -45,7 +45,7 @@ const Login = ({ setCurrentView }: Props) => {
       <form className="w-full" action={formAction}>
         <input
           type="hidden"
-          value={searchParams.get("returnTo") || ""}
+          value={searchParams.get("returnTo") || "/"}
           name="returnTo"
         />
         <div className="flex flex-col w-full gap-y-2">
