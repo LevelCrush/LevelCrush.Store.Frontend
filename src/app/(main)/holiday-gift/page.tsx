@@ -86,7 +86,7 @@ export default async function HolidayGiftPage() {
 
     const head = await headers();
     const pageUrl = head.get('x-url') || "/";
-    console.log(head, pageUrl);
+    console.log(pageUrl);
     redirect(`/account?returnTo=${encodeURIComponent(pageUrl)}`);
     return;
   }
