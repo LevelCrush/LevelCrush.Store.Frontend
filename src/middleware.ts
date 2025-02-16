@@ -11,6 +11,7 @@ const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us";
 export async function middleware(request: NextRequest) {
   // Store current request url in a custom header, which you can read later
   const requestHeaders = new Headers(request.headers);
+  console.log("url", request.nextUrl, request.url);
   requestHeaders.set("x-url", request.url);
 
   return NextResponse.next({
