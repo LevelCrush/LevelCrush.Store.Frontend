@@ -3,27 +3,33 @@
 import { H2 } from "@levelcrush/elements/headings";
 import { signout } from "@lib/data/customer";
 import { Button, Container } from "@medusajs/ui";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AccountProviderContext } from "../providers/account_provider";
 import { useRouter } from "next/router";
 import { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
 import { isObject } from "@lib/util/isEmpty";
 import { redirect } from "next/navigation";
+import ContainerInner from "@levelcrush/elements/container_inner";
 
 export default function LogoutHelper() {
   const { account } = useContext(AccountProviderContext);
 
+  /*
   useDeepCompareEffectNoCheck(() => {
     if (isObject(account) === false) {
       signout("us", true, "/");
     }
-  }, [account]);
+  }, [account]); */
+
+  useEffect(() => {
+    signout("us", true, "/");
+  }, []);
 
   function renderStillHere() {
     return (
-      <>
-        <H2>Still here?</H2>
-        <p>Get going. git.</p>
+      <ContainerInner>
+        <H2>You are being logged out.</H2>
+        <p className="my-4">If you are still here afer an extended period of time, please click the button below</p>
         <Button
           variant="primary"
           onClick={async (ev) => {
@@ -34,7 +40,7 @@ export default function LogoutHelper() {
         >
           Log me out
         </Button>
-      </>
+      </ContainerInner>
     );
   }
 
