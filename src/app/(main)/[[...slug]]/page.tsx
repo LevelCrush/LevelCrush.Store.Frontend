@@ -7,20 +7,6 @@ type Props = {
   params: Promise<{ slug: string[] }>;
 };
 
-/* Maybe look into this? 
-export async function generateStaticParams() {
-  
-  const staticParams = countryCodes
-    ?.map((countryCode: string | undefined) =>
-      categoryHandles.map((handle: any) => ({
-        countryCode,
-        category: [handle],
-      }))
-    )
-    .flat()
-
-  return staticParams
-} */
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
@@ -34,7 +20,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       console.log("Could not find route", route);
       notFound();
     }
- 
+
     const title = page.tabName || "Level Crush";
     const description = page.metaDescription || "";
 
@@ -46,18 +32,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       },
     };
   } catch (error) {
-    console.log("Err");
+    console.log("Err", error);
     notFound();
   }
 }
 
 export default async function FallbackPage(props: Props) {
-
-  console.warn("Looking for slug");
   const params = await props.params;
   const slugs = params.slug || [];
   const route = `/${slugs.join("/")}`;
-
+  console.info("Looking for route", route);
   const page = await cms.page(route);
   if (!page) {
     notFound();
