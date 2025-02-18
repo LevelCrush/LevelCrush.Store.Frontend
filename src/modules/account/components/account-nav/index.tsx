@@ -1,8 +1,8 @@
 "use client";
 
 import { clx } from "@medusajs/ui";
-import { ArrowRightOnRectangle, UserGroup, UsersSolid } from "@medusajs/icons";
-import { redirect, useParams, usePathname, useRouter } from "next/navigation";
+import { ArrowRightOnRectangle, UserGroup, } from "@medusajs/icons";
+import { useParams, usePathname, } from "next/navigation";
 
 import ChevronDown from "@modules/common/icons/chevron-down";
 import User from "@modules/common/icons/user";
@@ -11,10 +11,6 @@ import Package from "@modules/common/icons/package";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { HttpTypes, StoreCustomer } from "@medusajs/types";
 import { signout } from "@lib/data/customer";
-import { useContext } from "react";
-import { AccountProviderContext } from "@levelcrush/providers/account_provider";
-import { useDeepCompareEffectNoCheck } from "use-deep-compare-effect";
-import { isObject } from "lodash";
 
 const AccountNav = ({
   customer,
@@ -31,7 +27,7 @@ const AccountNav = ({
 
   return (
     <div>
-      <div className="small:hidden" data-testid="mobile-account-nav">
+      <div className="block small:hidden" data-testid="mobile-account-nav">
         {route !== `/${countryCode}/account` ? (
           <LocalizedClientLink
             href="/account"
