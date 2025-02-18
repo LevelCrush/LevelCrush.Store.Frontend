@@ -20,8 +20,6 @@ export default async function Profile() {
   const customer = await retrieveCustomer("no-store");
   const regions = await listRegions();
 
-  console.log("Hello");
-
   if (!customer || !regions) {
     const head = await headers();
     const pageUrl = head.get("x-url") || "/";

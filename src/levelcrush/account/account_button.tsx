@@ -27,6 +27,7 @@ interface DiscordValidationResult {
 
 export default function AccountButton(props: { type?: "discord" | "normal" }) {
   const { account, accountFetch } = useContext(AccountProviderContext);
+  const [isLoggingIn, setIsLoggingIn]  = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -54,11 +55,19 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
   }
 
   async function doLogin() {
+
+    if(isLoggingIn) {
+      return;
+    }
+
+
     const returnToUrl = searchParams.has("returnTo")
       ? searchParams.get("returnTo") || window.location.href
       : window.location.href;
 
     if (loginType === "discord") {
+      setIsLoggingIn(true);
+      
       const customerLoginUrl = `${
         process.env["NEXT_PUBLIC_MEDUSA_BACKEND_URL"] || ""
       }/auth/customers/levelcrush-auth?redirect=${encodeURIComponent(
@@ -74,6 +83,15 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
       try {
         const json = await result.json();
         if (json.location) {
+          
+          console.log("Forcing a logout before attempting to login");
+          await fetch(`${process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]}/logout`, {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store"
+          });
+
+
           router.push(json.location);
           return;
         }
@@ -109,7 +127,7 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
     );
   } else {
     return (
-      <Button intention="normal" onClick={doLogin}>
+      <Button disabled={isLoggingIn} intention={isLoggingIn ? "inactive" : "normal"} onClick={doLogin}>
         {props.type == "discord" ? "Login With Discord" : "Login"}
       </Button>
     );

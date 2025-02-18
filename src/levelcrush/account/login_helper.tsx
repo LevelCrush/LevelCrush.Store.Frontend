@@ -131,6 +131,7 @@ export default function LoginHelper() {
         {
           method: "GET",
           credentials: "include",
+          cache: "no-store",
         }
       );
 
@@ -199,6 +200,18 @@ export default function LoginHelper() {
       //const form = new FormData();
       //form.append("token", token);
       //form.append("validation", JSON.stringify(sessionJson));
+
+      await fetch(
+        `${
+          process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"] || ""
+        }/logout`,
+        {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        }
+      );
+
 
       if (userRedirect) {
         //router.push(userRedirect);
