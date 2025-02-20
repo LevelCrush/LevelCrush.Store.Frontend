@@ -5,8 +5,9 @@ import { CMSPageRecord } from "./cms_page";
 import { MenuRecord } from "@levelcrush/menu";
 
 export async function blog(slug: string) {
-  const posts = (await client.fetch(
-    `*[_type == "post" && slug.current == $slug] {
+  try {
+    const posts = (await client.fetch(
+      `*[_type == "post" && slug.current == $slug] {
         _id,
         title,
         "image": image.asset->,
@@ -16,11 +17,14 @@ export async function blog(slug: string) {
         _createdAt,
         _updatedAt
         }`,
-    { slug: slug }
-  )) as BlogPostRecord[];
+      { slug: slug }
+    )) as BlogPostRecord[];
 
-  const post = (posts || []).at(0);
-  return post;
+    const post = (posts || []).at(0);
+    return post;
+  } catch {
+    return null;
+  }
 }
 
 export async function blogPaginate(
@@ -28,7 +32,8 @@ export async function blogPaginate(
   end: number = 9,
   sort: "asc" | "desc" = "desc"
 ) {
-  const latestPost = (await client.fetch(`
+  try {
+    const latestPost = (await client.fetch(`
             *[_type == "post"] | order(publishedAt ${sort})[${start}..${end}] {
               _id,
               title,
@@ -39,12 +44,16 @@ export async function blogPaginate(
               _createdAt,
               _updatedAt
             }`)) as BlogPostListingRecord[] | null | undefined;
-  return latestPost;
+    return latestPost;
+  } catch {
+    return null;
+  }
 }
 
 export async function page(route: string = "/") {
-  const pages = (await client.fetch(
-    `*[_type == "page" && route.current == $route] 
+  try {
+    const pages = (await client.fetch(
+      `*[_type == "page" && route.current == $route] 
       {
           title,
           id, 
@@ -60,18 +69,22 @@ export async function page(route: string = "/") {
           "template" : template-> { "slug": slug.current, metadata },
           body
       }`,
-    {
-      route,
-    }
-  )) as CMSPageRecord[] | null | undefined;
+      {
+        route,
+      }
+    )) as CMSPageRecord[] | null | undefined;
 
-  const page = (pages || []).at(0);
-  return page;
+    const page = (pages || []).at(0);
+    return page;
+  } catch {
+    return null;
+  }
 }
 
 export async function menu(id: string = "") {
-  const menu = (await client.fetch(
-    `
+  try {
+    const menu = (await client.fetch(
+      `
     *[ _type == "menu" && slug.current == $menu][0] {
       title,
       url, 
@@ -101,12 +114,15 @@ export async function menu(id: string = "") {
       }
     }
     `,
-    {
-      menu: id,
-    }
-  )) as MenuRecord | null;
+      {
+        menu: id,
+      }
+    )) as MenuRecord | null;
 
-  return menu;
+    return menu;
+  } catch {
+    return null;
+  }
 }
 
 export const cms = {

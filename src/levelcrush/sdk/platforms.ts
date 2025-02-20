@@ -43,16 +43,23 @@ function forceRedirect(
   }
 }
 
-async function platformSession(platform: Platform) {
+async function platformClaim(platform: Platform, code: string) {
   const req = await fetch(
     `${
       process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
-    }/platform/${encodeURIComponent(platform)}/session`,
+    }/platform/${encodeURIComponent(platform)}/claim`,
     {
-      method: "GET",
+      method: "POST",
       mode: "cors",
       cache: "no-store",
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        token: code,
+      }),
     }
   );
 
@@ -65,11 +72,10 @@ export async function platformUnlink(
   customer: StoreCustomer | null,
   router: AppRouterInstance
 ) {
-  
-  if(platform === "discord") { 
+  if (platform === "discord") {
     return;
   }
-  
+
   const metadata = customer ? customer.metadata || {} : {};
 
   const platformKeys = Object.keys(metadata).filter((v) =>
@@ -128,7 +134,7 @@ export async function platformLinkDiscord(
 ) {
   const metadata = platformMetadataDiscord(discordValidationResult);
   await updateCustomer({
-    metadata
+    metadata,
   });
 }
 
@@ -136,10 +142,14 @@ export async function platformStart(
   platform: Platform,
   router: AppRouterInstance
 ) {
+  const token = crypto.randomUUID();
+
   var childWindow = window.open(
     `${
       process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]
-    }/platform/${encodeURIComponent(platform)}/login`,
+    }/platform/${encodeURIComponent(platform)}/login?token=${encodeURIComponent(
+      token
+    )}`,
     "_blank"
   );
 
@@ -147,12 +157,12 @@ export async function platformStart(
     var intervalHandle = setInterval(async () => {
       if (childWindow?.closed) {
         clearInterval(intervalHandle);
-        const data = await platformSession(platform);
+        const data = await platformClaim(platform, token);
 
         if (platform == "bungie") {
           const bungieValidation = data as BungieValidationResult;
           platformLinkBungie(bungieValidation);
-        } else if(platform == "discord") {
+        } else if (platform == "discord") {
           const discordValidation = data as DiscordValidationResult;
           platformLinkDiscord(discordValidation);
         }

@@ -83,15 +83,7 @@ export default function AccountButton(props: { type?: "discord" | "normal" }) {
       try {
         const json = await result.json();
         if (json.location) {
-          
-          console.log("Forcing a logout before attempting to login");
-          await fetch(`${process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"]}/logout`, {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store"
-          });
-
-
+        
           router.push(json.location);
           return;
         }
