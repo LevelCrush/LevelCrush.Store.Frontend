@@ -52,7 +52,6 @@ export async function orderHolidayGift(formData: FormData) {
     await clearCart();
 
     const customer = await retrieveCustomer("no-store");
-    console.log("Customer loaded in", customer);
     
     const metadata = customer?.metadata || {};
     if (!metadata["discord.id"]) {

@@ -95,15 +95,23 @@ export default function LoginHelper() {
     redirectUrl: string,
     redirectType: "didLogin" = "didLogin"
   ) {
-    const windowUrl = new URL(redirectUrl);
-    const amount = windowUrl.searchParams.has(redirectType)
-      ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
-      : 0;
-    windowUrl.searchParams.append(redirectType, (amount + 1).toString());
-    if (!router) {
-      setTimeout(() => (window.location.href = windowUrl.toString()), 250);
+    if (redirectUrl === "/") {
+      if (!router) {
+        setTimeout(() => (window.location.href = "/"), 250);
+      } else {
+        router.push("/");
+      }
     } else {
-      router.push(windowUrl.toString());
+      const windowUrl = new URL(redirectUrl);
+      const amount = windowUrl.searchParams.has(redirectType)
+        ? parseInt(windowUrl.searchParams.get(redirectType) || "0") || 0
+        : 0;
+      windowUrl.searchParams.append(redirectType, (amount + 1).toString());
+      if (!router) {
+        setTimeout(() => (window.location.href = windowUrl.toString()), 250);
+      } else {
+        router.push(windowUrl.toString());
+      }
     }
   }
 
@@ -124,20 +132,9 @@ export default function LoginHelper() {
         credentials: "include",
       });
 
-      var sessReq = await fetch(
-        `${
-          process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"] || ""
-        }/platform/discord/session`,
-        {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        }
-      );
-
       const data = await res.json();
       let token = data.token;
-      const sessionJson = (await sessReq.json()) as DiscordValidationResult;
+
       const shouldCreateCustomer =
         (decodeToken(token) as { actor_id: string }).actor_id === "";
 
@@ -152,11 +149,42 @@ export default function LoginHelper() {
 
       window.localStorage.setItem("medusa_jwt", token);
 
-      const metadata = platformMetadataDiscord(sessionJson);
+      var sessReq = await fetch(
+        `${
+          process.env["NEXT_PUBLIC_MEDUSA_BACKEND_URL"] || ""
+        }/store/levelcrush-auth/info?token=${encodeURIComponent(
+          (queryParams.token as string) || ""
+        )}`,
+        {
+          method: "POST",
+          credentials: "include",
+          cache: "no-store",
+          headers: {
+            Authorization: "Bearer " + token,
+            "x-publishable-api-key":
+              process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
+          },
+        }
+      );
+
+      const sessionJson = (await sessReq.json()) as {
+        success: boolean;
+        error: {};
+        data: {
+          redirect: string;
+          metadata: Record<string, unknown>;
+        };
+      };
+
+      const metadata = sessionJson.data.metadata || {};
 
       if (shouldCreateCustomer) {
         console.log("Attempting to create your customer record");
-        await createCustomer(token, sessionJson.email, metadata);
+        await createCustomer(
+          token,
+          (metadata["discord.email"] as string) || "",
+          metadata
+        );
 
         console.log("Attempting to refresh your token");
         token = await refreshToken(token);
@@ -184,7 +212,7 @@ export default function LoginHelper() {
 
         console.log("Attempting to update your customer record");
         await updateCustomer({
-          first_name: metadata["discord.globalName"],
+          first_name: (metadata["discord.globalName"] as string) || "",
           last_name: account && account.last_name ? account.last_name : "",
           phone: account && account.phone ? account.phone : "",
           company_name:
@@ -195,23 +223,7 @@ export default function LoginHelper() {
         console.log("Done updating customer record");
       }
 
-      const userRedirect = sessionJson.userRedirect || "";
-
-      //const form = new FormData();
-      //form.append("token", token);
-      //form.append("validation", JSON.stringify(sessionJson));
-
-      await fetch(
-        `${
-          process.env["NEXT_PUBLIC_LEVELCRUSH_AUTH_SERVER"] || ""
-        }/logout`,
-        {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        }
-      );
-
+      const userRedirect = sessionJson.data.redirect || "";
 
       if (userRedirect) {
         //router.push(userRedirect);
