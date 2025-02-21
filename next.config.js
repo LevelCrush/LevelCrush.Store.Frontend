@@ -2,11 +2,13 @@ const checkEnvVariables = require("./check-env-variables");
 
 checkEnvVariables();
 
+const deployment_ID = process.env["DEPLOYMENT_ID"] || crypto.randomUUID();
+
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  deploymentId: process.env["DEPLOYMENT_ID"] || crypto.randomUUID(),
+  deploymentId: process.env["NODE_ENV"] === "production" ? deployment_ID : undefined,
   headers: async () => {
     return [
       {
