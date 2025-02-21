@@ -7,34 +7,29 @@ type Props = {
   params: Promise<{ slug: string[] }>;
 };
 
-
 export async function generateMetadata(props: Props): Promise<Metadata> {
+
   const params = await props.params;
-  try {
-    const params = await props.params;
-    const slugs = params.slug || [];
-    // const slug = params.cmsSlug1 || "";
-    const route = `/${slugs.join("/")}`;
-    const page = await cms.page(route);
-    if (!page) {
-      console.log("Could not find route", route);
-      notFound();
-    }
+  const slugs = params.slug || [];
+  // const slug = params.cmsSlug1 || "";
+  const route = `/${slugs.join("/")}`;
 
-    const title = page.tabName || "Level Crush";
-    const description = page.metaDescription || "";
-
-    return {
-      title: title,
-      description,
-      alternates: {
-        canonical: ``,
-      },
-    };
-  } catch (error) {
-    console.log("Err", error);
+  const page = await cms.page(route);
+  if (!page) {
+    console.log("Could not find route: metadata", route);
     notFound();
   }
+
+  const title = page.tabName || "Level Crush";
+  const description = page.metaDescription || "";
+
+  return {
+    title: title,
+    description,
+    alternates: {
+      canonical: ``,
+    },
+  };
 }
 
 export default async function FallbackPage(props: Props) {
@@ -44,18 +39,20 @@ export default async function FallbackPage(props: Props) {
   console.info("Looking for route", route);
   const page = await cms.page(route);
   if (!page) {
+    console.log("Could not find route: page");
     notFound();
   }
 
   let cmsProps = {
     page: page,
-    additional: {},
+    additional: {"posts": []},
   } as CMSPageProps;
 
+  /* disable blog post loading
   if (route == "/" && cmsProps.additional) {
     const latestPost = await cms.blogPaginate();
     cmsProps.additional["posts"] = latestPost;
-  }
+  } */
 
   return <CMSPage {...cmsProps} />;
 }
