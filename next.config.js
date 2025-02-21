@@ -6,6 +6,7 @@ checkEnvVariables();
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  deploymentId: process.env["DEPLOYMENT_ID"] || crypto.randomUUID(),
   headers: async () => {
     return [
       {
